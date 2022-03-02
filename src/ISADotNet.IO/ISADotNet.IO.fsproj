@@ -5,7 +5,16 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOn>3390;$(WarnOn)</WarnOn>
   </PropertyGroup>
-
+  <PropertyGroup>
+  	<Authors>Jonathan Ott, Heinrich Lukas Weil</Authors>
+  	<Description>"This library contains reader functions to interact with the different formats present in an ARC"</Description>
+  	<Summary>"This library contains reader functions to interact with the different formats present in an ARC"</Summary>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+  	<PackageProjectUrl>https://nfdi4plants.github.io/arcIO.NET/</PackageProjectUrl>
+  	<PackageTags>fsharp dotnet IO ARC</PackageTags>
+  	<RepositoryUrl>https://github.com/nfdi4plants/arcIO.NET</RepositoryUrl>
+  	<RepositoryType>git</RepositoryType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="ISADotNet.fs" />
   </ItemGroup>
