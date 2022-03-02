@@ -3,6 +3,35 @@
 open ISADotNet
 open ISADotNet.API
 
+module Process = 
+
+    /// If the process implements the given characteristic, return the list of output files together with their according characteristic values of this characteristic
+    let tryGetOutputsWithCharacteristicBy (predicate : MaterialAttribute -> bool) (p : Process) =
+        match  p.Inputs, p.Outputs with
+        | Some is,Some os ->
+            List.zip is os
+            |> List.choose (fun (i,o) ->
+                ProcessInput.tryGetCharacteristics i
+                |> Option.defaultValue []
+                |> List.tryPick (fun mv -> 
+                    match mv.Category with
+                    | Some m when predicate m -> Some (o,mv)
+                    | _ -> None
+                )
+            )
+            |> Option.fromValueWithDefault []
+        | _ -> None
+
+module ProcessSequence = 
+
+    /// If the processes contain a process implementing the given parameter, return the list of output files together with their according parameter values of this parameter
+    let getOutputsWithCharacteristicBy (predicate:MaterialAttribute -> bool) (processSequence : Process list) =
+        processSequence
+        |> List.choose (Process.tryGetOutputsWithCharacteristicBy predicate)
+        |> List.concat
+
+
+
 module ISADotNet =
     type SourceSinkPair = 
         {
