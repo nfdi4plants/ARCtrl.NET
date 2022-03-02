@@ -126,6 +126,57 @@ module BasicTasks =
         |>  Seq.iter (fun (fromDir, toDir) -> Shell.copyDir toDir fromDir (fun _ -> true))
     }
 
+/// Package creation
+module PackageTasks = 
+
+    open ProjectInfo
+    open BasicTasks
+
+    let pack = BuildTask.create "Pack" [clean; build; copyBinaries] {
+        if promptYesNo (sprintf "creating stable package with version %s OK?" stableVersionTag ) 
+            then
+                !! "src/**/*.*proj"
+                |> Seq.iter (Fake.DotNet.DotNet.pack (fun p ->
+                    let msBuildParams =
+                        {p.MSBuildParams with 
+                            Properties = ([
+                                "Version",stableVersionTag
+                                "PackageReleaseNotes",  (release.Notes |> String.concat "\r\n")
+                            ] @ p.MSBuildParams.Properties)
+                        }
+                    {
+                        p with 
+                            MSBuildParams = msBuildParams
+                            OutputPath = Some pkgDir
+                    }
+                ))
+        else failwith "aborted"
+    }
+
+    let packPrerelease = BuildTask.create "PackPrerelease" [setPrereleaseTag; clean; build; copyBinaries] {
+        if promptYesNo (sprintf "package tag will be %s OK?" prereleaseTag )
+            then 
+                !! "src/**/*.*proj"
+                //-- "src/**/Plotly.NET.Interactive.fsproj"
+                |> Seq.iter (Fake.DotNet.DotNet.pack (fun p ->
+                            let msBuildParams =
+                                {p.MSBuildParams with 
+                                    Properties = ([
+                                        "Version", prereleaseTag
+                                        "PackageReleaseNotes",  (release.Notes |> String.toLines )
+                                    ] @ p.MSBuildParams.Properties)
+                                }
+                            {
+                                p with 
+                                    VersionSuffix = Some prereleaseSuffix
+                                    OutputPath = Some pkgDir
+                                    MSBuildParams = msBuildParams
+                            }
+                ))
+        else
+            failwith "aborted"
+    }
+
 open BasicTasks
 BuildTask.runOrDefault copyBinaries
 

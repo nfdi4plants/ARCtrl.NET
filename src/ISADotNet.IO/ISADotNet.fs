@@ -22,8 +22,8 @@ module ISADotNet =
         assay.ProcessSequence.Value
         |> List.map (fun x -> 
             List.map2 ( fun i o ->
-                let iNameOpt = (API.ProcessInput.getName i)
-                let oNameOpt = (API.ProcessOutput.getName o)
+                let iNameOpt = (API.ProcessInput.tryGetName i)
+                let oNameOpt = (API.ProcessOutput.tryGetName o)
                 match iNameOpt, oNameOpt with
                 | None, _ -> None
                 | _, None -> None
@@ -58,7 +58,7 @@ module ISADotNet =
             ProcessSequence.filterByProtocolName protocolName ps
             |> ProcessSequence.getOutputsWithParameterBy (fun (p:ProtocolParameter) -> ProtocolParameter.getNameAsStringWithNumber p = parameterName)
             |> List.tryPick (fun (o,p) -> 
-                match ProcessOutput.getName o with
+                match ProcessOutput.tryGetName o with
                 | Some o when o = sampleName -> Some (ProcessParameterValue.getValueAsString p)
                 | _ -> None
             )
@@ -70,7 +70,7 @@ module ISADotNet =
             ProcessSequence.filterByProtocolName protocolName ps
             |> ProcessSequence.getOutputsWithCharacteristicBy (fun (ma : MaterialAttribute) -> MaterialAttribute.getNameAsStringWithNumber ma = characteristicName)
             |> List.tryPick (fun (o,p) -> 
-                match ProcessOutput.getName o with
+                match ProcessOutput.tryGetName o with
                 | Some o when o = sampleName -> Some (MaterialAttributeValue.getValueAsString p)
                 | _ -> None
             )
