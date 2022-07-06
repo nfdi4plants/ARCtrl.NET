@@ -33,3 +33,8 @@ module Study =
             }
         | None -> 
             {study with ProcessSequence = study.ProcessSequence |> Option.map ProcessSequence.updateByItself}
+
+    let readByIdentifier (arc : string) (studyIdentifier : string) =
+        Path.Combine ([|arc;"studies";studyIdentifier|])
+        |> readFromFolder arc
+
