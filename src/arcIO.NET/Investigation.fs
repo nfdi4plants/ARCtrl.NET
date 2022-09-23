@@ -1,4 +1,4 @@
-﻿namespace arcIO.Net
+﻿namespace arcIO.NET
 
 open ISADotNet
 open ISADotNet.XLSX

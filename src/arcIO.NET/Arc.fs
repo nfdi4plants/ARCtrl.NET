@@ -1,4 +1,4 @@
-﻿namespace arcIO.Net
+﻿namespace arcIO.NET
 
 module Arc =
 
