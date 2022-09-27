@@ -16,44 +16,40 @@ module Investigation =
         // get study list from study files and assay files
         let istudies = 
             i.Studies
-            |> Option.map (fun studies ->
-                studies
-                |> List.map (fun study -> 
-                    // read study from file
-                    let studyFromFile = Study.readByIdentifier arc study.Identifier.Value
-                    // update study assays and contacts with information from assay files
-                    match study.Assays with
-                    | Some assays ->
-                        let scontacts,sassays = 
-                            assays
-                            |> List.fold (fun (cl,al) assay ->
-                                let contactsFromFile,assayFromFile = Assay.readByFileName arc assay.FileName.Value
-                                cl @ contactsFromFile, al @ [assayFromFile]
-                            ) (studyFromFile.Contacts |> Option.defaultValue [],[])
-                        {studyFromFile with                        
-                            Contacts = Some scontacts
-                            Assays = Some sassays 
-                        }
-                    | None -> 
-                        studyFromFile
-                )
-            )
+            |> Option.map (List.map (fun study -> 
+                // read study from file
+                let studyFromFile = Study.readByIdentifier arc study.Identifier.Value
+                // update study assays and contacts with information from assay files
+                match study.Assays with
+                | Some assays ->
+                    let scontacts,sassays = 
+                        assays
+                        |> List.fold (fun (cl,al) assay ->
+                            let contactsFromFile,assayFromFile = Assay.readByFileName arc assay.FileName.Value
+                            cl @ contactsFromFile, al @ [assayFromFile]
+                        ) (studyFromFile.Contacts |> Option.defaultValue [],[])
+                    {studyFromFile with                        
+                        Contacts = Some scontacts
+                        Assays = Some sassays 
+                    }
+                | None -> 
+                    studyFromFile
+            ))
         
         // construct complete process list from studies and assays, then update by itself
         let iprocesses = 
             istudies
             |> Option.map (List.fold (fun pl study ->
-                    let sprocesses = study.ProcessSequence |> Option.defaultValue []
-                    let aprocesses =
-                        study.Assays
-                        |> Option.map (List.fold (fun spl assay ->
-                            let ap = assay.ProcessSequence |> Option.defaultValue []
-                            spl @ ap
-                        ) [])
-                        |> Option.defaultValue []
-                    pl @ sprocesses @ aprocesses
-                ) []
-            )
+                let sprocesses = study.ProcessSequence |> Option.defaultValue []
+                let aprocesses =
+                    study.Assays
+                    |> Option.map (List.fold (fun spl assay ->
+                        let ap = assay.ProcessSequence |> Option.defaultValue []
+                        spl @ ap
+                    ) [] )
+                    |> Option.defaultValue []
+                pl @ sprocesses @ aprocesses
+            ) [] )
             |> Option.defaultValue []
         let ref = iprocesses |> ProcessSequence.updateByItself
 
