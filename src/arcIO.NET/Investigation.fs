@@ -9,41 +9,63 @@ module Investigation =
     let investigationFileName = "isa.investigation.xlsx"
 
     let fromArcFolder (arc : string) =
+        // read investigation from investigation file
         let ip = Path.Combine(arc,investigationFileName)
-        let i = Investigation.fromFile ip 
-        match i.Studies with
-        | Some ss -> 
-            let ps,studies =
-                ss
-                |> List.fold (fun (ps,studies) study ->
-                    let ps',study' = 
-                        match study.Assays with
-                        | Some assays ->
-                            let contacts,ps' = 
-                                assays
-                                |> List.fold (fun (contacts,processSequence) a -> 
-                                    let c,a = Assay.readByFileName arc a.FileName.Value               
-                                    contacts @ c, processSequence @ (a.ProcessSequence |> Option.defaultValue [])
-                                ) (study.Contacts |> Option.defaultValue [],study.ProcessSequence |> Option.defaultValue [])
-                    
-                            let study = 
-                                {study with                        
-                                    Contacts = Option.fromValueWithDefault [] (contacts |> List.distinct)
-                                }
-                            ps', study
-                        | None -> 
-                            study.ProcessSequence |> Option.defaultValue [],study
-                    ps @ ps', studies @ [study']
-                ) ([],[])
-            let ref = ps |> ProcessSequence.updateByItself
-            let studies' =
+        let i = Investigation.fromFile ip
+
+        // get study list from study files and assay files
+        let istudies = 
+            i.Studies
+            |> Option.map (fun studies ->
                 studies
-                |> List.map (fun study ->
-                    {study with
-                        Assays = study.Assays |> Option.map (List.map (fun a -> {a with ProcessSequence = a.ProcessSequence |> Option.map (ProcessSequence.updateByRef ref)}))
-                        ProcessSequence = study.ProcessSequence |> Option.map (ProcessSequence.updateByRef ref)
-                    }
+                |> List.map (fun study -> 
+                    // read study from file
+                    let studyFromFile = Study.readByIdentifier arc study.Identifier.Value
+                    // update study assays and contacts with information from assay files
+                    match study.Assays with
+                    | Some assays ->
+                        let scontacts,sassays = 
+                            assays
+                            |> List.fold (fun (cl,al) assay ->
+                                let contactsFromFile,assayFromFile = Assay.readByFileName arc assay.FileName.Value
+                                cl @ contactsFromFile, al @ [assayFromFile]
+                            ) (studyFromFile.Contacts |> Option.defaultValue [],[])
+                        {studyFromFile with                        
+                            Contacts = Some scontacts
+                            Assays = Some sassays 
+                        }
+                    | None -> 
+                        studyFromFile
                 )
-            {i with Studies = Some studies'}
-        | None -> 
-            i
+            )
+        
+        // construct complete process list from studies and assays, then update by itself
+        let iprocesses = 
+            istudies
+            |> Option.map (List.fold (fun pl study ->
+                    let sprocesses = study.ProcessSequence |> Option.defaultValue []
+                    let aprocesses =
+                        study.Assays
+                        |> Option.map (List.fold (fun spl assay ->
+                            let ap = assay.ProcessSequence |> Option.defaultValue []
+                            spl @ ap
+                        ) [])
+                        |> Option.defaultValue []
+                    pl @ sprocesses @ aprocesses
+                ) []
+            )
+            |> Option.defaultValue []
+        let ref = iprocesses |> ProcessSequence.updateByItself
+
+        // update investigation processes
+        let istudies' =
+            istudies
+            |> Option.map (List.map (fun study ->
+                {study with
+                    Assays = study.Assays |> Option.map (List.map (fun a -> {a with ProcessSequence = a.ProcessSequence |> Option.map (ProcessSequence.updateByRef ref)}))
+                    ProcessSequence = study.ProcessSequence |> Option.map (ProcessSequence.updateByRef ref)
+                }
+            ))
+
+        // fill investigation with information from study files and assay files
+        {i with Studies = istudies'}
