@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Workflow.fs" />
+    <Compile Include="Run.fs" />
     <Compile Include="ProcessSequence.fs" />
     <Compile Include="Assay.fs" />
     <Compile Include="Study.fs" />
@@ -19,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.6.0" />
+    <PackageReference Include="ISADotNet.XLSX" Version="0.6.1" />
   </ItemGroup>
 
   <PropertyGroup>
