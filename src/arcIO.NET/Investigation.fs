@@ -65,3 +65,7 @@ module Investigation =
 
         // fill investigation with information from study files and assay files
         {i with Studies = istudies'}
+
+    let write (arc : string) (investigation : Investigation) =
+        let p = Path.Combine(arc,investigationFileName)
+        ISADotNet.XLSX.Investigation.toFile p investigation

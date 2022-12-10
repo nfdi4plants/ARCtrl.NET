@@ -7,7 +7,19 @@ open System.IO
 
 module Study = 
 
+    let rootFolderName = "studies"
+
     let studyFileName = "isa.study.xlsx"
+
+    let subFolderPaths = 
+        ["resources";"protocol"]
+
+    module StudyFolder =
+        
+        /// Checks if an study folder exists in the ARC.
+        let exists (arc : string) (identifier : string) =
+            Path.Combine([|arc;rootFolderName;identifier|])
+            |> System.IO.Directory.Exists
 
     let readFromFolder (arc : string) (folderPath : string) =
         let sp = Path.Combine (folderPath,studyFileName)
@@ -35,6 +47,46 @@ module Study =
             {study with ProcessSequence = study.ProcessSequence |> Option.map ProcessSequence.updateByItself}
 
     let readByIdentifier (arc : string) (studyIdentifier : string) =
-        Path.Combine ([|arc;"studies";studyIdentifier|])
+        Path.Combine ([|arc;rootFolderName;studyIdentifier|])
         |> readFromFolder arc
 
+    let writeToFolder (folderPath : string) (study : Study) =
+        let sp = Path.Combine (folderPath,studyFileName)
+        StudyFile.Study.toFile sp study        
+
+    let write (arc : string) (study : Study) =
+        if study.FileName.IsNone then
+            failwith "Cannot write study to arc, as it has no filename"
+        let sp = Path.Combine ([|arc;rootFolderName;study.FileName.Value|])
+        StudyFile.Study.toFile sp study    
+
+
+    let init (arc : string) (study : Study) =
+        
+        if study.Identifier.IsNone || study.FileName.IsNone then
+            failwith "Given study does not contain identifier or filename"
+
+        let studyIdentifier = study.Identifier.Value
+
+        if StudyFolder.exists arc studyIdentifier then
+            printfn $"Study folder with identifier {studyIdentifier} already exists."
+        else
+            subFolderPaths 
+            |> List.iter (fun n ->
+                let dp = Path.Combine([|arc;rootFolderName;studyIdentifier;n|])
+                let dir = Directory.CreateDirectory(dp)
+                File.Create(Path.Combine(dir.FullName, ".gitkeep")) |> ignore 
+            )
+
+            let studyFilePath = Path.Combine([|arc;rootFolderName;study.FileName.Value|])
+
+            StudyFile.Study.toFile studyFilePath study
+
+
+    let initFromName  (arc : string) (studyName : string) =
+        
+        let studyFileName = Path.Combine(studyName,studyFileName)
+
+        let study = Study.create(FileName = studyFileName, Identifier = studyName)
+
+        init arc study
