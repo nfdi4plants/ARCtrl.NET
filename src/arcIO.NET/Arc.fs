@@ -14,7 +14,7 @@ module Arc =
         |> List.iter (fun n ->
             let dp = Path.Combine(arcPath,n)
             let dir = Directory.CreateDirectory(dp)
-            File.Create(Path.Combine(dir.FullName, ".gitkeep")) |> ignore 
+            File.Create(Path.Combine(dir.FullName, ".gitkeep")).Close()
         )
 
     let importFromInvestigation (arcPath) (investigation : Investigation)= 

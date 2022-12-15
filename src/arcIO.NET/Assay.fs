@@ -62,7 +62,7 @@ module Assay =
             |> List.iter (fun n ->
                 let dp = Path.Combine([|arc;rootFolderName;assayIdentifier;n|])
                 let dir = Directory.CreateDirectory(dp)
-                File.Create(Path.Combine(dir.FullName, ".gitkeep")) |> ignore 
+                File.Create(Path.Combine(dir.FullName, ".gitkeep")).Close()
             )
 
             let assayFilePath = Path.Combine([|arc;rootFolderName;assay.FileName.Value|])
