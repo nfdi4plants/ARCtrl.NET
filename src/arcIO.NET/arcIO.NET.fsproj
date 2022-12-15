@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Workflow.fs" />
+    <Compile Include="Run.fs" />
     <Compile Include="ProcessSequence.fs" />
     <Compile Include="Assay.fs" />
     <Compile Include="Study.fs" />
@@ -15,11 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.5" />
+    <PackageReference Update="FSharp.Core" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.6.0" />
+    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.2" />
   </ItemGroup>
 
   <PropertyGroup>
