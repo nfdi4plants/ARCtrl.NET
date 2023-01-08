@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.2" />
+    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.3" />
   </ItemGroup>
 
   <PropertyGroup>
