@@ -75,7 +75,7 @@ module Study =
             |> List.iter (fun n ->
                 let dp = Path.Combine([|arc;rootFolderName;studyIdentifier;n|])
                 let dir = Directory.CreateDirectory(dp)
-                File.Create(Path.Combine(dir.FullName, ".gitkeep")) |> ignore 
+                File.Create(Path.Combine(dir.FullName, ".gitkeep")).Close()
             )
 
             let studyFilePath = Path.Combine([|arc;rootFolderName;study.FileName.Value|])
