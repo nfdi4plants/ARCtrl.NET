@@ -21,17 +21,17 @@ module Assay =
             |> System.IO.Directory.Exists
 
     let readFromFolder (folderPath : string) =
-        let ap = Path.Combine (folderPath,assayFileName)
+        let ap = Path.Combine(folderPath,assayFileName).Replace(@"\","/")
         let c,a = AssayFile.Assay.fromFile ap
         c,a
 
     let readByFileName (arc : string) (assayFileName : string) =
-        let ap = Path.Combine ([|arc;rootFolderName;assayFileName|])
+        let ap = Path.Combine([|arc;rootFolderName;assayFileName|]).Replace(@"\","/")
         let c,a = AssayFile.Assay.fromFile ap
         c,a
 
     let readByName (arc : string) (assayName : string) =
-        Path.Combine ([|arc;rootFolderName;assayName|])
+        Path.Combine([|arc;rootFolderName;assayName|]).Replace(@"\","/")
         |> readFromFolder
 
     let writeToFolder (folderPath : string) (contacts : Person list) (assay : Assay) =
@@ -72,7 +72,7 @@ module Assay =
 
     let initFromName (arc : string) (assayName : string) =
         
-        let assayFileName = Path.Combine(assayName,assayFileName)
+        let assayFileName = Path.Combine(assayName,assayFileName).Replace(@"\","/")
 
         let assay = Assay.create(FileName = assayFileName)
 
