@@ -8,9 +8,25 @@ module Investigation =
 
     let investigationFileName = "isa.investigation.xlsx"
 
+    /// Creates an investigation file in the ARC from the given investigation metadata contained in cliArgs that contains no studies or assays.
+    let create (investigation : ISADotNet.Investigation) (arc : string) =
+           
+        let log = Logging.createLogger "InvestigationCreateLog"
+        
+        log.Info("Start Investigation Create")
+
+        if System.IO.File.Exists(Path.Combine(arc,investigationFileName)) then
+            log.Error("Investigation file does already exist.")
+
+        else 
+            let investigationFilePath = Path.Combine(arc,investigationFileName)    
+            Investigation.toFile investigationFilePath investigation
+
     let fromArcFolder (arc : string) =
+        let log = Logging.createLogger "InvestigationFromArcFolderLog"
+
         // read investigation from investigation file
-        let ip = Path.Combine(arc,investigationFileName)
+        let ip = Path.Combine(arc,investigationFileName).Replace(@"\","/")
         let i = Investigation.fromFile ip
 
         // get study list from study files and assay files
@@ -18,22 +34,32 @@ module Investigation =
             i.Studies
             |> Option.map (List.map (fun study -> 
                 // read study from file
-                let studyFromFile = Study.readByIdentifier arc study.Identifier.Value
-                // update study assays and contacts with information from assay files
-                match study.Assays with
-                | Some assays ->
-                    let scontacts,sassays = 
-                        assays
-                        |> List.fold (fun (cl,al) assay ->
-                            let contactsFromFile,assayFromFile = Assay.readByFileName arc assay.FileName.Value
-                            cl @ contactsFromFile, al @ [assayFromFile]
-                        ) (studyFromFile.Contacts |> Option.defaultValue [],[])
-                    {studyFromFile with                        
-                        Contacts = Some scontacts
-                        Assays = Some sassays 
-                    }
-                | None -> 
-                    studyFromFile
+                match study.Identifier with
+                | Some id ->
+                    let studyFromFile = Study.readByIdentifier arc id
+                    // update study assays and contacts with information from assay files
+                    match study.Assays with
+                    | Some assays ->
+                        let scontacts,sassays = 
+                            assays
+                            |> List.fold (fun (cl,al) assay ->
+                                match assay.FileName with
+                                | Some fn ->
+                                    let contactsFromFile,assayFromFile = Assay.readByFileName arc assay.FileName.Value
+                                    cl @ contactsFromFile, al @ [assayFromFile]
+                                | None ->
+                                    log.Warn("Study \'" + id + "\' contains Assay without filename.")
+                                    cl, al @ [assay]
+                            ) (studyFromFile.Contacts |> Option.defaultValue [],[])
+                        {studyFromFile with                        
+                            Contacts = Some (scontacts |> List.distinct)
+                            Assays = Some sassays 
+                        }
+                    | None -> 
+                        studyFromFile
+                | None ->
+                    log.Warn("Investigation file contains study without identifier.")
+                    study
             ))
         
         // construct complete process list from studies and assays, then update by itself
