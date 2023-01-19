@@ -1,4 +1,5 @@
-﻿open BlackFox.Fake
+﻿module Build
+open BlackFox.Fake
 open System.IO
 open Fake.Core
 open Fake.DotNet
