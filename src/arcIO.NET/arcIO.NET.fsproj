@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Logging.fs" />
+    <Compile Include="GitHelper.fs" />
     <Compile Include="Workflow.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="ProcessSequence.fs" />
@@ -22,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.3" />
+    <PackageReference Include="NLog" Version="5.1.1" />
   </ItemGroup>
 
   <PropertyGroup>
