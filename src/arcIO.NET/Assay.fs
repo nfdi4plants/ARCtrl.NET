@@ -13,6 +13,10 @@ module Assay =
     let subFolderPaths = 
         ["dataset";"protocol"]
 
+    let nameToFileName (n:string) =
+        if n.Contains("/") || n.Contains("\\") then n else
+        Path.Combine(n,assayFileName)
+
     module AssayFolder =
         
         /// Checks if an assay folder exists in the ARC.
@@ -71,9 +75,16 @@ module Assay =
 
 
     let initFromName (arc : string) (assayName : string) =
-        
-        let assayFileName = Path.Combine(assayName,assayFileName).Replace(@"\","/")
 
-        let assay = Assay.create(FileName = assayFileName)
+        let assay = Assay.create(FileName = nameToFileName assayName)
 
         init arc assay
+
+[<AutoOpen>]
+module AssayExtensions =
+    type Assay with
+        static member create (?Id,?Name,?MeasurementType,?TechnologyType,?TechnologyPlatform,?DataFiles,?Materials,?CharacteristicCategories,?UnitCategories,?ProcessSequence,?Comments) : Assay =
+            let Filename = 
+                Name
+                |> Option.map Assay.nameToFileName
+            Assay.make Id Filename MeasurementType TechnologyType TechnologyPlatform DataFiles Materials CharacteristicCategories UnitCategories ProcessSequence Comments
