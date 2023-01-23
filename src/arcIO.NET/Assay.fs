@@ -38,6 +38,21 @@ module Assay =
         Path.Combine([|arc;rootFolderName;assayName|]).Replace(@"\","/")
         |> readFromFolder
 
+    let tryReadFromFolder (folderPath : string) =
+        try 
+            readFromFolder folderPath |> Some
+        with | _ -> None
+
+    let tryReadByFileName (arc : string) (assayFileName : string) =
+        try 
+            readByFileName arc assayFileName |> Some
+        with | _ -> None
+
+    let tryReadByName (arc : string) (assayName : string) =
+        try 
+            readByName arc assayName |> Some
+        with | _ -> None
+
     let writeToFolder (folderPath : string) (contacts : Person list) (assay : Assay) =
         let ap = Path.Combine (folderPath,assayFileName)
         AssayFile.Assay.toFile ap contacts assay        
