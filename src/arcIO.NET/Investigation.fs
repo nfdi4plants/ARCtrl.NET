@@ -9,7 +9,7 @@ module Investigation =
     let investigationFileName = "isa.investigation.xlsx"
 
     /// Creates an investigation file in the ARC from the given investigation metadata contained in cliArgs that contains no studies or assays.
-    let create (investigation : ISADotNet.Investigation) (arc : string) =
+    let write (arc : string) (investigation : ISADotNet.Investigation) =
            
         let log = Logging.createLogger "InvestigationCreateLog"
         
@@ -91,7 +91,3 @@ module Investigation =
 
         // fill investigation with information from study files and assay files
         {i with Studies = istudies'}
-
-    let write (arc : string) (investigation : Investigation) =
-        let p = Path.Combine(arc,investigationFileName)
-        ISADotNet.XLSX.Investigation.toFile p investigation
