@@ -22,7 +22,7 @@ module Study =
             |> System.IO.Directory.Exists
 
     let readFromFolder (arc : string) (folderPath : string) =
-        let sp = Path.Combine (folderPath,studyFileName)
+        let sp = Path.Combine(folderPath,studyFileName).Replace(@"\","/")
         let study = StudyFile.Study.fromFile sp
         match study.Assays with
         | Some assays ->
@@ -85,7 +85,7 @@ module Study =
 
     let initFromName  (arc : string) (studyName : string) =
         
-        let studyFileName = Path.Combine(studyName,studyFileName)
+        let studyFileName = Path.Combine(studyName,studyFileName).Replace(@"\","/")
 
         let study = Study.create(FileName = studyFileName, Identifier = studyName)
 
