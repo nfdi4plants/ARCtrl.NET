@@ -22,6 +22,30 @@ module Investigation =
             let investigationFilePath = Path.Combine(arcDir,investigationFileName)    
             Investigation.toFile investigationFilePath investigation
 
+    /// Creates an investigation file in the ARC.
+    let overWrite (arcDir : string) (investigation : ISADotNet.Investigation) =
+           
+        let log = Logging.createLogger "InvestigationWriteLog"
+        log.Info("Start Investigation Write")
+
+        let investigationFilePath = Path.Combine(arcDir,investigationFileName)
+
+        if System.IO.File.Exists(investigationFilePath) then
+            try 
+                let cache = File.ReadAllBytes(investigationFilePath)
+                File.Delete(investigationFilePath)
+                try                     
+                    Investigation.toFile investigationFilePath investigation
+                with
+                | err -> 
+                    File.WriteAllBytes(investigationFilePath,cache)
+                    log.Error($"Investigation file could not be overwritten: {err.Message}")
+            with 
+            | err -> 
+                log.Error($"Investigation file could not be overwritten: {err.Message}")
+        else 
+            Investigation.toFile investigationFilePath investigation
+
     /// Reads an investigation from the ARC.
     let read (arcDir : string) =
            
@@ -37,6 +61,7 @@ module Investigation =
             log.Error("Investigation file does not exist.")
             raise (System.SystemException())
 
+    /// Reads and combines all ISA components of the ARC into the ISA object
     let fromArcFolder (arcDir : string) =
         let log = Logging.createLogger "InvestigationFromArcFolderLog"
 
@@ -52,6 +77,7 @@ module Investigation =
                 match study.Identifier with
                 | Some id ->
                     let studyFromFile = Study.readByIdentifier arcDir id
+                    let mergedStudy = API.Update.UpdateByExistingAppendLists.updateRecordType study studyFromFile
                     // update study assays and contacts with information from assay files
                     match study.Assays with
                     | Some assays ->
@@ -65,13 +91,13 @@ module Investigation =
                                 | None ->
                                     log.Warn("Study \'" + id + "\' contains Assay without filename.")
                                     cl, al @ [assay]
-                            ) (studyFromFile.Contacts |> Option.defaultValue [],[])
-                        {studyFromFile with                        
+                            ) (mergedStudy.Contacts |> Option.defaultValue [],[])
+                        {mergedStudy with
                             Contacts = Some (scontacts |> List.distinct)
                             Assays = Some sassays 
                         }
                     | None -> 
-                        studyFromFile
+                        mergedStudy
                 | None ->
                     log.Warn("Investigation file contains study without identifier.")
                     study
@@ -106,7 +132,9 @@ module Investigation =
 
         // fill investigation with information from study files and assay files
         {i with Studies = istudies'}
+        |> API.Investigation.update
 
+    /// Registers an assay to the investigation arc registry
     let registerAssay arcDir studyName (assayName) =
 
         let log = Logging.createLogger "RegisterAssayLog"
@@ -143,3 +171,8 @@ module Investigation =
             [study]
         |> API.Investigation.setStudies investigation
         |> write arcDir
+
+    /// Update investigation file with information from the different ISA components of the ARC
+    let updateRegistry arcDir =
+        fromArcFolder arcDir
+        |> overWrite arcDir

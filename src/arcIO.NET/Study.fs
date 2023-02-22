@@ -75,16 +75,89 @@ module Study =
         Path.Combine ([|arc;rootFolderName;studyIdentifier|])
         |> readFromFolder arc
 
+    /// Writes a study to the given folder. Fails, if the file already exists
     let writeToFolder (folderPath : string) (study : Study) =
-        let sp = Path.Combine (folderPath,studyFileName)
-        StudyFile.Study.toFile sp study        
 
+        let log = Logging.createLogger "StudyWriteLog"
+        
+        log.Info("Start Study Write")
+
+        let studyFilePath = Path.Combine (folderPath,studyFileName)
+
+        if System.IO.File.Exists(studyFilePath) then
+            log.Error("Study file does already exist.")
+
+        else 
+            StudyFile.Study.toFile studyFilePath study 
+
+    /// Writes a study to the given folder. Overwrites it, if the file already exists
+    let overWriteToFolder (folderPath : string) (study : Study) =
+           
+        let log = Logging.createLogger "StudyWriteLog"
+        log.Info("Start Study Write")
+
+        let studyFilePath = Path.Combine (folderPath,studyFileName)
+
+        if System.IO.File.Exists(studyFilePath) then
+            try 
+                let cache = File.ReadAllBytes(studyFilePath)
+                File.Delete(studyFilePath)
+                try                     
+                    StudyFile.Study.toFile studyFilePath study 
+                with
+                | err -> 
+                    File.WriteAllBytes(studyFilePath,cache)
+                    log.Error($"Study file could not be overwritten: {err.Message}")
+            with 
+            | err -> 
+                log.Error($"Study file could not be overwritten: {err.Message}")
+        else 
+            StudyFile.Study.toFile studyFilePath study 
+
+    /// Writes a study to the arc. Fails, if the file already exists
     let write (arc : string) (study : Study) =
-        if study.FileName.IsNone then
-            failwith "Cannot write study to arc, as it has no filename"
-        let sp = Path.Combine ([|arc;rootFolderName;study.FileName.Value|])
-        StudyFile.Study.toFile sp study    
 
+        let log = Logging.createLogger "StudyWriteLog"
+        
+        log.Info("Start Study Write")
+
+        if study.FileName.IsNone then
+            log.Error("Cannot write study to arc, as it has no filename")
+        else 
+
+            let studyFilePath = Path.Combine ([|arc;rootFolderName;study.FileName.Value|])
+
+            if System.IO.File.Exists(studyFilePath) then
+                log.Error("Study file does already exist.")
+
+            else 
+                StudyFile.Study.toFile studyFilePath study 
+
+    /// Writes a study to the arc. Overwrites it, if the file already exists
+    let overWrite (arc : string) (study : Study) =
+        let log = Logging.createLogger "StudyWriteLog"
+        
+        log.Info("Start Study Write")
+
+        if study.FileName.IsNone then
+            log.Error("Cannot write study to arc, as it has no filename")
+        else 
+            let studyFilePath = Path.Combine ([|arc;rootFolderName;study.FileName.Value|])
+            if System.IO.File.Exists(studyFilePath) then
+                try 
+                    let cache = File.ReadAllBytes(studyFilePath)
+                    File.Delete(studyFilePath)
+                    try                     
+                        StudyFile.Study.toFile studyFilePath study 
+                    with
+                    | err -> 
+                        File.WriteAllBytes(studyFilePath,cache)
+                        log.Error($"Study file could not be overwritten: {err.Message}")
+                with 
+                | err -> 
+                    log.Error($"Study file could not be overwritten: {err.Message}")
+            else 
+                StudyFile.Study.toFile studyFilePath study 
 
     let init (arc : string) (study : Study) =
         
