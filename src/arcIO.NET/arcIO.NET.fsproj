@@ -16,6 +16,7 @@
     <Compile Include="Study.fs" />
     <Compile Include="Investigation.fs" />
     <Compile Include="Arc.fs" />
+    <Compile Include="Converter.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.8" />
+    <PackageReference Include="LitXml" Version="0.1.0" />
     <PackageReference Include="NLog" Version="5.1.2" />
   </ItemGroup>
 
