@@ -16,15 +16,17 @@
     <Compile Include="Study.fs" />
     <Compile Include="Investigation.fs" />
     <Compile Include="Arc.fs" />
+    <Compile Include="Converter.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="7.0.0" />
+    <PackageReference Update="FSharp.Core" Version="7.0.300-beta.23114.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.5" />
-    <PackageReference Include="NLog" Version="5.1.1" />
+    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.8" />
+    <PackageReference Include="LitXml" Version="0.1.0" />
+    <PackageReference Include="NLog" Version="5.1.2" />
   </ItemGroup>
 
   <PropertyGroup>
