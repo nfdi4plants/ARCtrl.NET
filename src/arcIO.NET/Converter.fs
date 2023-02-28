@@ -4,14 +4,15 @@ open ISADotNet
 open ISADotNet.QueryModel
 open FsSpreadsheet.DSL
 open LitXml
-
+open JsonDSL
+open System.Text.Json
 
 type ARCconverter =
 | ARCtoCSV      of (QInvestigation -> QStudy -> QAssay -> SheetEntity<Workbook>)
 | ARCtoTSV      of (QInvestigation -> QStudy -> QAssay -> SheetEntity<Workbook>)
 | ARCtoXLSX     of (QInvestigation -> QStudy -> QAssay -> SheetEntity<Workbook>)
 | ARCtoXML      of (QInvestigation -> QStudy -> QAssay -> LitXml.XmlPart)
-//| ARCtoJSON     of QInvestigation -> QStudy -> QAssay -> 
+| ARCtoJSON     of (QInvestigation -> QStudy -> QAssay -> JEntity<Nodes.JsonNode>)
 
     member this.ConvertCSV(i,s,a) = 
         match this with
@@ -33,4 +34,7 @@ type ARCconverter =
         | ARCtoXML f -> f i s a
         | _ -> failwith "could not convert to xml"
 
-
+    member this.ConvertJsn(i,s,a) = 
+        match this with
+        | ARCtoJSON f -> f i s a
+        | _ -> failwith "could not convert to xml"
