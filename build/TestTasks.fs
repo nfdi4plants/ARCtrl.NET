@@ -7,6 +7,7 @@ open ProjectInfo
 open BasicTasks
 
 let runTests = BuildTask.create "RunTests" [clean; build] {
+    printfn $"Testprojectcount: {Seq.length testProjects}"
     testProjects
     |> Seq.iter (fun testProject ->
         Fake.DotNet.DotNet.test(fun testParams ->

@@ -6,7 +6,7 @@ let project = "arcIO.NET"
 
 let testProjects = 
     [
-        // add relative paths (from project root) to your testprojects here
+        "tests/arcIO.NET.Tests/arcIO.NET.Tests.fsproj"
     ]
 
 let solutionFile  = $"{project}.sln"

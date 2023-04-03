@@ -7,6 +7,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "arcIO.NET", "src\arcIO.NET\
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Build", "build\Build.fsproj", "{E7F453CD-BCCA-42EF-96A2-C74B9A09A593}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "arcIO.NET.Tests", "tests\arcIO.NET.Tests\arcIO.NET.Tests.fsproj", "{71F0320C-879D-47FA-B665-B5BD1F467F76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{E7F453CD-BCCA-42EF-96A2-C74B9A09A593}.Release|x64.Build.0 = Release|Any CPU
 		{E7F453CD-BCCA-42EF-96A2-C74B9A09A593}.Release|x86.ActiveCfg = Release|Any CPU
 		{E7F453CD-BCCA-42EF-96A2-C74B9A09A593}.Release|x86.Build.0 = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|x64.Build.0 = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Debug|x86.Build.0 = Debug|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|x64.ActiveCfg = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|x64.Build.0 = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|x86.ActiveCfg = Release|Any CPU
+		{71F0320C-879D-47FA-B665-B5BD1F467F76}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
