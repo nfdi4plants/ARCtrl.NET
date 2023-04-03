@@ -24,7 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.8" />
+    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.10" />
+    <PackageReference Include="JsonDSL" Version="0.0.5" />
     <PackageReference Include="LitXml" Version="0.1.0" />
     <PackageReference Include="NLog" Version="5.1.2" />
   </ItemGroup>
