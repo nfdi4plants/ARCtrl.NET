@@ -8,10 +8,11 @@
 
   <ItemGroup>
     <Compile Include="Logging.fs" />
+    <Compile Include="Path.fs" />
+    <Compile Include="Contract.fs" />
     <Compile Include="GitHelper.fs" />
     <Compile Include="Workflow.fs" />
     <Compile Include="Run.fs" />
-    <Compile Include="ProcessSequence.fs" />
     <Compile Include="Assay.fs" />
     <Compile Include="Study.fs" />
     <Compile Include="Investigation.fs" />
@@ -20,11 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="7.0.300-beta.23114.3" />
+    <PackageReference Update="FSharp.Core" Version="7.0.300" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ISADotNet.XLSX" Version="0.7.0-preview.10" />
+    <PackageReference Include="ARCtrl" Version="1.0.0-alpha2" />
+    <PackageReference Include="FsSpreadsheet.ExcelIO" Version="4.1.0" />
     <PackageReference Include="JsonDSL" Version="0.0.5" />
     <PackageReference Include="LitXml" Version="0.1.0" />
     <PackageReference Include="NLog" Version="5.1.2" />

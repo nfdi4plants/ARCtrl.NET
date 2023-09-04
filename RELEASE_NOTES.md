@@ -1,3 +1,8 @@
+### 0.1.0+4145f8d (Released 2023-4-3)
+* Additions:
+    * [[#aca980b](https://github.com/nfdi4plants/arcIO.NET/commit/aca980bef59e7b6b17b8376e83b5177cf3f442d1)] include json in converter
+    * [[#4145f8d](https://github.com/nfdi4plants/arcIO.NET/commit/4145f8dee6642bfef7384370750503a9d8a433a0)] setup test environmet pin dotnet version to 6.x.x update ISADotNet reference
+
 ### 0.0.6+da8c364 (Released 2023-1-26)
 * Additions:
     * [[#6ed4bc8](https://github.com/nfdi4plants/arcIO.NET/commit/6ed4bc840dc09e2f8dd348a79241eb64c7de8d5c)] migrate githelper and logging from arcCommander
