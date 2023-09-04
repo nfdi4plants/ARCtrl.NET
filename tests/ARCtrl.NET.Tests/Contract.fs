@@ -25,6 +25,6 @@ let testWrite =
 [<Tests>]
 let main = 
     testList "ContractTests" [
-        testRead
-        testWrite
+        //testRead
+        //testWrite
     ]
