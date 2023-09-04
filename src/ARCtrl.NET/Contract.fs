@@ -1,7 +1,6 @@
-﻿module ARCtrl.Contract
+﻿module ARCtrl.NET.Contract
 
 open ARCtrl.Contract
-open Path
 open FsSpreadsheet
 open FsSpreadsheet.ExcelIO
 
@@ -23,15 +22,15 @@ let fulfillWriteContract basePath (c : Contract) =
     match c.DTO with
     | Some (DTO.Spreadsheet wb) ->
         let path = System.IO.Path.Combine(basePath, c.Path)
-        ensureDirectory path
+        Path.ensureDirectory path
         FsWorkbook.toFile path (wb :?> FsWorkbook)
     | Some (DTO.Text t) ->
         let path = System.IO.Path.Combine(basePath, c.Path)
-        ensureDirectory path
+        Path.ensureDirectory path
         System.IO.File.WriteAllText(path,t)
     | None -> 
         let path = System.IO.Path.Combine(basePath, c.Path)
-        ensureDirectory path
+        Path.ensureDirectory path
         System.IO.File.Create(path).Close()
     | _ -> 
         log.Info(sprintf "Contract %s is not an ISA contract" c.Path)

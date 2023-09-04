@@ -13,4 +13,4 @@ let getAllFilePaths (directoryPath : string) =
                   yield! dirs |> Seq.collect Directory.EnumerateDirectories |> allFiles }
 
     allFiles [directoryPath] |> Seq.toArray
-    |> Array.map (fun p -> p.Replace(directoryPath, ""))
+    |> Array.map (fun p -> p.Replace(directoryPath, "").Replace("\\","/"))

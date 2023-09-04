@@ -1,4 +1,4 @@
-﻿//namespace ARCtrl.NET
+﻿namespace ARCtrl.NET
 
 //open ISADotNet
 //open ISADotNet.XLSX
