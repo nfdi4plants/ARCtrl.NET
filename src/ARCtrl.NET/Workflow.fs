@@ -1,4 +1,4 @@
-﻿namespace arcIO.NET
+﻿namespace ARCtrl.NET
 
 module Workflow =
 

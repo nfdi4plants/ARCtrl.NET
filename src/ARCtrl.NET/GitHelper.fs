@@ -1,4 +1,4 @@
-﻿namespace arcIO.NET
+﻿namespace ARCtrl.NET
 
 open System.Diagnostics
 open System.Runtime.InteropServices

@@ -12,18 +12,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Utils.fs" />
+    <Compile Include="Path.fs" />
+    <Compile Include="Contract.fs" />
+    <Compile Include="Arc.fs" />
     <Compile Include="AssayTests.fs" />
     <Compile Include="Main.fs" />
+    <Folder Include="TestObjects" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Expecto" Version="9.*" />
+    <PackageReference Include="Expecto" Version="10.1.0" />
     <PackageReference Include="FSharp.Data" Version="5.0.2" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
     <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
-    <ProjectReference Include="..\..\src\arcIO.NET\arcIO.NET.fsproj" />
+    <ProjectReference Include="..\..\src\ARCtrl.NET\ARCtrl.NET.fsproj" />
     <PackageReference Update="FSharp.Core" Version="7.0.300-beta.23127.2" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿module arcIO.NET.Path
+﻿module ARCtrl.NET.Path
 
 open System.IO
 

@@ -1,4 +1,4 @@
-﻿//namespace arcIO.NET.Converter
+﻿//namespace ARCtrl.NET.Converter
 
 //open ISADotNet
 //open ISADotNet.QueryModel

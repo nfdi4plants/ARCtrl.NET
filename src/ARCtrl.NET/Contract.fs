@@ -1,4 +1,4 @@
-﻿module arcIO.NET.Contract
+﻿module ARCtrl.Contract
 
 open ARCtrl.Contract
 open Path
