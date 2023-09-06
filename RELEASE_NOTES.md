@@ -1,3 +1,12 @@
+### 1.0.0+0974fbc (Released 2023-9-4)
+* Additions:
+    * Renamed to ARCtrl.NET
+    * [[#8f02de0](https://github.com/nfdi4plants/ARCtrl.NET/commit/8f02de0eb6dae97543f1dfdd492e1eab4d14d7b1)] rework and add first path tests
+    * [[#92c4667](https://github.com/nfdi4plants/ARCtrl.NET/commit/92c466783ee72414602c0ef2b24cd336b56935b8)] rename project to ARCtrl.NET
+    * [[#2f6da75](https://github.com/nfdi4plants/ARCtrl.NET/commit/2f6da7591e47bc5c5cfdbbcb8ecf75b547786eff)] add arc read in using arctrl contracts
+* Bugfixes:
+    * [[#0974fbc](https://github.com/nfdi4plants/ARCtrl.NET/commit/0974fbc912aa686626d2d03bf0b0339c8d764a2d)] postpone contract test implementation as specifiaction is not yet fixed
+
 ### 0.1.0+4145f8d (Released 2023-4-3)
 * Additions:
     * [[#aca980b](https://github.com/nfdi4plants/arcIO.NET/commit/aca980bef59e7b6b17b8376e83b5177cf3f442d1)] include json in converter

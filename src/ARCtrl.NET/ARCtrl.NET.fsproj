@@ -34,14 +34,12 @@
 
   <PropertyGroup>
   	<Authors>nfdi4plants, Lukas Weil</Authors>
-  	<Description>Library for easy handling of ARC folders and files and reading and writing the ISAModel behind it.</Description>
+  	<Description>Library for easy handling of ARC folders and files with file access in .NET.</Description>
   	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   	<!--<PackageProjectUrl>https://fslab.org/docs-template/</PackageProjectUrl>-->
-  	<PackageIconUrl>https://raw.githubusercontent.com/nfdi4plants/Branding/138420e3b6f9ec9e125c1ca8840874b2be2a1262/logos/DataPLANT_logo_minimal_rounded_bg_transparent.svg</PackageIconUrl>
-  	<PackageTags>F# FSharp dotnet .Net bioinformatics biology datascience metadata investigation study assay ISA XLSX ARC IO</PackageTags>
-  	<RepositoryUrl>https://github.com/nfdi4plants/arcIO.NET</RepositoryUrl>
+  	<PackageTags>F# FSharp dotnet .Net bioinformatics biology datascience metadata investigation study assay ISA XLSX ARC IO ARCtrl</PackageTags>
+    <PackageProjectUrl>https://github.com/nfdi4plants/ARCtrl.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nfdi4plants/ARCtrl.NET</RepositoryUrl>
   	<RepositoryType>git</RepositoryType>
-  	<FsDocsLicenseLink>https://github.com/nfdi4plants/arcIO.NET/blob/developer/LICENSE</FsDocsLicenseLink>
-  	<FsDocsReleaseNotesLink>https://github.com/nfdi4plants/arcIO.NET/blob/developer/RELEASE_NOTES.md</FsDocsReleaseNotesLink>
-  </PropertyGroup>
+ </PropertyGroup>
 </Project>
