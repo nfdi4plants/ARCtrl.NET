@@ -8,6 +8,10 @@ module ARCExtensions =
 
     type ARC with
 
+        member this.Write(arcPath) =
+            this.GetWriteContracts()
+            |> Array.iter (Contract.fulfillWriteContract arcPath)
+
         static member load (arcPath : string) =
             let paths = Path.getAllFilePaths arcPath
             let arc = ARC.fromFilePaths paths
@@ -31,7 +35,7 @@ module ARCExtensions =
     //    )
 
         /// Initializes the ARC-specific git repository.
-        static member initGit workDir (repositoryAddress : string option) (branch : string option) =
+        static member initGit(workDir,?repositoryAddress : string,?branch : string) =
 
             let log = Logging.createLogger "ArcInitGitLog"
 
@@ -42,8 +46,6 @@ module ARCExtensions =
             try
 
                 GitHelper.executeGitCommand workDir $"init -b {branch}"
-                //GitHelper.executeGitCommand workDir $"add ."
-                //GitHelper.executeGitCommand workDir $"commit -m \"Initial commit\""
 
                 log.Trace("Add remote repository")
                 match repositoryAddress with
