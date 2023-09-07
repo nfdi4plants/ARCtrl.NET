@@ -1,11 +1,10 @@
-### 1.0.0+0974fbc (Released 2023-9-4)
+### 1.0.0+47011f8 (Released 2023-9-7)
 * Additions:
-    * Renamed to ARCtrl.NET
-    * [[#8f02de0](https://github.com/nfdi4plants/ARCtrl.NET/commit/8f02de0eb6dae97543f1dfdd492e1eab4d14d7b1)] rework and add first path tests
-    * [[#92c4667](https://github.com/nfdi4plants/ARCtrl.NET/commit/92c466783ee72414602c0ef2b24cd336b56935b8)] rename project to ARCtrl.NET
-    * [[#2f6da75](https://github.com/nfdi4plants/ARCtrl.NET/commit/2f6da7591e47bc5c5cfdbbcb8ecf75b547786eff)] add arc read in using arctrl contracts
+    * [[#d06e12c](https://github.com/nfdi4plants/ARCtrl.NET/commit/d06e12cb08726cdd349ab2d77db4fe1314271cca)] bump to 1.0.0-alpha1
+    * [[#2118bdd](https://github.com/nfdi4plants/ARCtrl.NET/commit/2118bdd326281ba955c755d77d562fa070ba9f7b)] add write function
+
 * Bugfixes:
-    * [[#0974fbc](https://github.com/nfdi4plants/ARCtrl.NET/commit/0974fbc912aa686626d2d03bf0b0339c8d764a2d)] postpone contract test implementation as specifiaction is not yet fixed
+    * [[#47011f8](https://github.com/nfdi4plants/ARCtrl.NET/commit/47011f8d30f3d72d927f4540a9515e55c0028f22)] add more contraints to getAllpaths fix #10
 
 ### 0.1.0+4145f8d (Released 2023-4-3)
 * Additions:
