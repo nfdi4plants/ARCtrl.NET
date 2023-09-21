@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="TestObjects/*.*" />
     <Compile Include="Path.fs" />
     <Compile Include="Contract.fs" />
     <Compile Include="Arc.fs" />
