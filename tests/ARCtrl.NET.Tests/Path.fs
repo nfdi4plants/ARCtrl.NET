@@ -5,10 +5,10 @@ open ARCtrl.NET
 open System.Text.Json
 
 
-let testPath =
+let getAllFilePaths =
 
-    testList "PathTests" [
-        testCase "getAllFilePaths" (fun () -> 
+    testList "GetAllFilePaths" [
+        testCase "simple" (fun () -> 
             let p = System.IO.Path.Combine(__SOURCE_DIRECTORY__,@"TestObjects\Path_findSubPaths")
             let result = Path.getAllFilePaths p
             let expected = 
@@ -24,4 +24,7 @@ let testPath =
     ]
 
 [<Tests>]
-let main = testPath
+let main = 
+    testList "PathTests" [
+        getAllFilePaths
+    ]

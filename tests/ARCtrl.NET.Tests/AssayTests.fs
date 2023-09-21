@@ -3,7 +3,7 @@
 open Expecto
 open System.Text.Json
 
-[<Tests>]
+//[<Tests>]
 let testComponentCasting =
 
     testList "Test" [

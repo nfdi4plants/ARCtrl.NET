@@ -5,6 +5,7 @@ open Expecto
 
 let all = testSequenced <| testList "All" [
         Path.Tests.main
+        Arc.Tests.main
     ]
 
 [<EntryPoint>]

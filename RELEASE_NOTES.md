@@ -1,8 +1,8 @@
-### 1.0.0+47011f8 (Released 2023-9-7)
+### 1.0.0+72d58da (Released 2023-9-19)
 * Additions:
+    * [[#72d58da](https://github.com/nfdi4plants/ARCtrl.NET/commit/72d58daddfdbe03f707db03bfc4edc6801dbd51b)] bump to 1.0.0-alpha2
     * [[#d06e12c](https://github.com/nfdi4plants/ARCtrl.NET/commit/d06e12cb08726cdd349ab2d77db4fe1314271cca)] bump to 1.0.0-alpha1
     * [[#2118bdd](https://github.com/nfdi4plants/ARCtrl.NET/commit/2118bdd326281ba955c755d77d562fa070ba9f7b)] add write function
-
 * Bugfixes:
     * [[#47011f8](https://github.com/nfdi4plants/ARCtrl.NET/commit/47011f8d30f3d72d927f4540a9515e55c0028f22)] add more contraints to getAllpaths fix #10
 
