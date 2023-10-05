@@ -2,11 +2,18 @@
 
 open BlackFox.Fake
 open Fake.DotNet
+open Fake.IO
+open Fake.IO.Globbing.Operators
 
 open ProjectInfo
 open BasicTasks
 
-let runTests = BuildTask.create "RunTests" [clean; build] {
+let runTestClean = BuildTask.create "CleanTestResults" [clean] {
+    !! "tests/**/TestResults"
+    |> Shell.cleanDirs
+}
+
+let runTests = BuildTask.create "RunTests" [clean; runTestClean; build] {
     printfn $"Testprojectcount: {Seq.length testProjects}"
     testProjects
     |> Seq.iter (fun testProject ->
@@ -22,7 +29,7 @@ let runTests = BuildTask.create "RunTests" [clean; build] {
 }
 
 // to do: use this once we have actual tests
-let runTestsWithCodeCov = BuildTask.create "RunTestsWithCodeCov" [clean; build] {
+let runTestsWithCodeCov = BuildTask.create "RunTestsWithCodeCov" [clean; runTestClean; build] {
     let standardParams = Fake.DotNet.MSBuild.CliArguments.Create ()
     testProjects
     |> Seq.iter(fun testProject -> 
