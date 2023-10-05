@@ -13,6 +13,10 @@ let fulfillReadContract basePath (c : Contract) =
         let path = System.IO.Path.Combine(basePath, c.Path)
         let wb = FsWorkbook.fromXlsxFile path |> box |> DTO.Spreadsheet
         {c with DTO = Some wb}
+    | Some DTOType.PlainText ->
+        let path = System.IO.Path.Combine(basePath, c.Path)
+        let text = System.IO.File.ReadAllText(path) |> DTO.Text
+        {c with DTO = Some text}
     | _ -> 
         log.Info(sprintf "Contract %s is not an ISA contract" c.Path) 
         c
@@ -34,3 +38,12 @@ let fulfillWriteContract basePath (c : Contract) =
         System.IO.File.Create(path).Close()
     | _ -> 
         log.Info(sprintf "Contract %s is not an ISA contract" c.Path)
+
+//let fulfillExecuteContract basePath (c : Contract) =
+//    let log = Logging.createLogger("ExecuteContractHandler")
+//    match c.DTO with
+//    | Some (DTO.CLITool tool) ->
+//        let path = System.IO.Path.Combine(basePath, c.Path)
+//        Path.ensureDirectory path
+//        FsWorkbook.toFile path (wb :?> FsWorkbook)
+//    | _ -> log.Info(sprintf "Contract %O is not an Execute contract" c)
