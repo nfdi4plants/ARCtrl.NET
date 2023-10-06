@@ -2,11 +2,11 @@
 
 open Fake.Core
 
-let project = "arcIO.NET"
+let project = "ARCtrl.NET"
 
 let testProjects = 
     [
-        "tests/arcIO.NET.Tests/arcIO.NET.Tests.fsproj"
+        "tests/ARCtrl.NET.Tests/ARCtrl.NET.Tests.fsproj"
     ]
 
 let solutionFile  = $"{project}.sln"
