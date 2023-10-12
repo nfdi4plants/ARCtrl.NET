@@ -6,6 +6,7 @@ open Expecto
 open System.IO
 open FsSpreadsheet
 open FsSpreadsheet.ExcelIO
+open ARCtrl.ISA.Spreadsheet
 
 let testInputFolder = System.IO.Path.Combine(__SOURCE_DIRECTORY__,@"TestObjects/Contracts")
 let testOutputFolder = System.IO.Path.Combine(__SOURCE_DIRECTORY__,@"TestResults/Contracts")
@@ -39,6 +40,54 @@ let testRead =
         )
     ]
 
+let testAssayRead =
+    let assayIdentifier = "measurement1"
+    let tableNames = 
+        [
+            "Cell Lysis"
+            "Protein Extraction"
+            "Protein Measurement"
+            "Computational Proteome Analysis"
+        ]
+    testList "AssayRead" [
+        
+        testCase "FsSpreadsheet" (fun () -> 
+            let fileName = "TestAssayFsSpreadsheet.xlsx"
+            let contract = Contract.createRead(fileName,DTOType.ISA_Assay)
+            let result = fulfillReadContract testInputFolder contract
+            let dto = Expect.wantSome result.DTO "DTO was not read correctly"
+            let wb = dto.AsSpreadsheet() :?> FsWorkbook
+            let assay = ArcAssay.fromFsWorkbook wb
+            Expect.equal assay.Identifier assayIdentifier "Assay identifier was not read correctly"
+            Expect.sequenceEqual assay.TableNames tableNames "Assay table names were not read correctly"
+            Expect.equal assay.Tables.[0].ColumnCount 6 "Assay table column count was not read correctly"
+            Expect.equal assay.Tables.[0].RowCount 7 "Assay table row count was not read correctly"
+        )
+        testCase "Excel" (fun () ->
+            let fileName = "TestAssayExcel.xlsx"
+            let contract = Contract.createRead(fileName,DTOType.ISA_Assay)
+            let result = fulfillReadContract testInputFolder contract
+            let dto = Expect.wantSome result.DTO "DTO was not read correctly"
+            let wb = dto.AsSpreadsheet() :?> FsWorkbook
+            let assay = ArcAssay.fromFsWorkbook wb
+            Expect.equal assay.Identifier assayIdentifier "Assay identifier was not read correctly"
+            Expect.sequenceEqual assay.TableNames tableNames "Assay table names were not read correctly"
+            Expect.equal assay.Tables.[0].ColumnCount 6 "Assay table column count was not read correctly"
+            Expect.equal assay.Tables.[0].RowCount 7 "Assay table row count was not read correctly"
+        )
+        testCase "Libre" (fun () ->
+            let fileName = "TestAssayLibre.xlsx"
+            let contract = Contract.createRead(fileName,DTOType.ISA_Assay)
+            let result = fulfillReadContract testInputFolder contract
+            let dto = Expect.wantSome result.DTO "DTO was not read correctly"
+            let wb = dto.AsSpreadsheet() :?> FsWorkbook
+            let assay = ArcAssay.fromFsWorkbook wb
+            Expect.equal assay.Identifier assayIdentifier "Assay identifier was not read correctly"
+            Expect.sequenceEqual assay.TableNames tableNames "Assay table names were not read correctly"
+            Expect.equal assay.Tables.[0].ColumnCount 6 "Assay table column count was not read correctly"
+            Expect.equal assay.Tables.[0].RowCount 7 "Assay table row count was not read correctly"
+        )
+    ]
 
 let testWrite =
 
@@ -101,6 +150,7 @@ let testExecute =
 [<Tests>]
 let main = 
     testList "ContractTests" [
+        testAssayRead
         testRead
         testWrite
     ]
