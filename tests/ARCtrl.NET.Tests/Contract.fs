@@ -31,10 +31,11 @@ let testRead =
             let wb = dto.AsSpreadsheet() :?> FsSpreadsheet.FsWorkbook
             let ws = Expect.wantSome (wb.TryGetWorksheetByName "TestSheet") "Workbook does not contain worksheet"
             let row1 = Expect.wantSome (ws.TryGetRowValuesAt 1) "Worksheet does not contain row 1"
-            let expected = ["1";"2";"3"]
-            Expect.sequenceEqual row1 expected "Worksheet does not contain correct values"
+            let row1AsInts = row1 |> Seq.map (string >> int)
+            let expected = [1;2;3]
+            Expect.sequenceEqual row1AsInts expected "Worksheet does not contain correct values"
             let row2 = Expect.wantSome (ws.TryGetRowValuesAt 2) "Worksheet does not contain row 2"
-            let expected = ["A";"B";"C"]
+            let expected = ["A";"B";"C"] |> Seq.map box
             Expect.sequenceEqual row2 expected "Worksheet does not contain correct values"      
         )
     ]
@@ -85,7 +86,7 @@ let testWrite =
             let wb = FsWorkbook.fromXlsxFile filePath
             let ws = Expect.wantSome (wb.TryGetWorksheetByName worksheetName) "Workbook does not contain worksheet"
             let row1 = Expect.wantSome (ws.TryGetRowValuesAt 1) "Worksheet does not contain row 1"
-            let expected = ["A1";"B1";"C1"]
+            let expected = ["A1";"B1";"C1"] |> Seq.map box
             Expect.sequenceEqual row1 expected "Worksheet does not contain correct values"      
         )
     ]

@@ -23,12 +23,12 @@
   <ItemGroup />
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="7.0.400" />
+    <PackageReference Update="FSharp.Core" Version="7.0.401" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ARCtrl" Version="1.0.0-alpha10" />
-    <PackageReference Include="FsSpreadsheet.ExcelIO" Version="4.1.0" />
+    <PackageReference Include="ARCtrl" Version="1.0.0-beta.1" />
+    <PackageReference Include="FsSpreadsheet.ExcelIO" Version="5.0.1" />
     <PackageReference Include="JsonDSL" Version="0.0.5" />
     <PackageReference Include="LitXml" Version="0.1.0" />
     <PackageReference Include="NLog" Version="5.1.2" />
