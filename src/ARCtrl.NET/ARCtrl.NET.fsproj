@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ARCtrl" Version="1.0.0-beta.1" />
+    <PackageReference Include="ARCtrl" Version="1.0.0-beta.2" />
     <PackageReference Include="FsSpreadsheet.ExcelIO" Version="5.0.1" />
     <PackageReference Include="JsonDSL" Version="0.0.5" />
     <PackageReference Include="LitXml" Version="0.1.0" />

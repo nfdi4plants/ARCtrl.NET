@@ -1,5 +1,7 @@
-### 1.0.0+ba3d2fa (Released 2023-10-29)
+### 1.0.0+da0642b (Released 2023-11-2)
 * Additions:
+    * [[#da0642b](https://github.com/nfdi4plants/ARCtrl.NET/commit/da0642b71f8ca4a9e4344fbee0879fb0a61f5831)] add querymodel project from previous ISADotNet state
+    * [[#ac8fb85](https://github.com/nfdi4plants/ARCtrl.NET/commit/ac8fb8506310f8e2bf8d9b8a5d15b34251149b0e)] bump to 1.0.0-beta.1
     * [[#70032b4](https://github.com/nfdi4plants/ARCtrl.NET/commit/70032b47f82a1177895d89ec314e44c357f95d0a)] add simple arc read-in test
     * [[#132788e](https://github.com/nfdi4plants/ARCtrl.NET/commit/132788efe421ceb23526c40e7c2dceac5f1ded3f)] include simple test arc
     * [[#c805976](https://github.com/nfdi4plants/ARCtrl.NET/commit/c80597620132a916d2fe05c8214e3cd58ec8c9e0)] add contract tests
