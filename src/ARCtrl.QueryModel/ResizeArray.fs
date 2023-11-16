@@ -49,3 +49,18 @@ module ResizeArray =
             for i in 1 .. a.Count - 1 do
                 state <- f state a.[i]
             state
+
+    let collect f (a : ResizeArray<_>) =
+        let b = ResizeArray<_>()
+        for i in a do
+            let c = f i
+            for j in c do
+                b.Add(j)
+        b
+
+    let distinct (a : ResizeArray<_>) =
+        let b = ResizeArray<_>()
+        for i in a do
+            if not (b.Contains(i)) then
+                b.Add(i)
+        b

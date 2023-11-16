@@ -121,35 +121,102 @@ module ProtocolExtensions =
 module ArcTableExtensions = 
 
     
+
+    type CRow(vals : seq<(CompositeHeader * CompositeCell)>) = 
+
+        member this.Cells = vals
+
+        static member input (row : CRow) = 
+            row.Cells
+            |> Seq.pick (fun (header,cell) -> if header.isInput then Some cell else None)
+
+        static member output (row : CRow) =
+            row.Cells
+            |> Seq.pick (fun (header,cell) -> if header.isOutput then Some cell else None)
+
+        static member inputName (row : CRow) =
+            row.Cells
+            |> Seq.pick (fun (header,cell) -> if header.isInput then cell.GetContent().[0] |> Some else None)
+
+        static member outputName (row : CRow) =
+            row.Cells
+            |> Seq.pick (fun (header,cell) -> if header.isOutput then cell.GetContent().[0] |> Some else None)
+
+        static member inputType (row : CRow)  =
+            row.Cells
+            |> Seq.pick (fun (header,_) -> header.tryInput())
+
+        static member outputType (row : CRow) =
+            row.Cells
+            |> Seq.pick (fun (header,_) -> header.tryOutput())
+
+        member this.InputName = CRow.inputName this
+
+        member this.OutputName = CRow.outputName this
+
+        member this.Input = this.InputName
+
+        member this.Output = this.OutputName
+
+        member this.InputType = CRow.inputType this
+
+        member this.OutputType = CRow.outputType this
+
+        member this.Values = 
+            this.Cells
+            |> Seq.choose (fun (header,cell) ->
+                ISAValue.tryCompose header cell                                       
+            )
+
 /// Queryable type representing a collection of processes implementing the same protocol. Or in ISAtab / ISAXLSX logic a sheet in an assay or study file.
 ///
 /// Values are represented rowwise with input and output entities.
     type ArcTable with
     
         member this.Rows = 
+            [
+                for i = 0 to this.RowCount - 1 do
+                    Seq.zip this.Headers (this.GetRow i)
+                    |> CRow
+
+            ]
             
-
-        member this.Values = 
-
-        
+        member this.ISAValues =          
             this.Rows
-            |> List.collect (fun r -> 
-                r.Vals
-                |> List.map (fun v -> 
-                    KeyValuePair ((r.Input,r.Output),v)
+            |> Seq.collect (fun r -> 
+                let i = r.InputName
+                let o = r.OutputName
+                r.Cells
+                |> Seq.choose (fun (header,cell) ->
+                    ISAValue.tryCompose header cell
+                    |> Option.map (fun v -> KeyValuePair ((i,o),v))                                            
                 )
+                
             )
+            |> Seq.toList
             |> IOValueCollection
 
-        member this.TryGetChildProtocolTypeOf(parentProtocolType : OntologyAnnotation) =
-            this.Protocols
-            |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType) then Some p else None)
-            |> Option.fromValueWithDefault []
+        static member inputType (t : ArcTable)  =
+            t.Headers
+            |> Seq.pick (fun header -> header.tryInput())
 
-        member this.TryGetChildProtocolTypeOf(parentProtocolType : OntologyAnnotation, obo : Obo.OboOntology) =
-            this.Protocols
-            |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType, obo) then Some p else None)
-            |> Option.fromValueWithDefault []
+        static member outputType (t : ArcTable) =
+            t.Headers
+            |> Seq.pick (fun header -> header.tryOutput())
+
+        member this.InputType = ArcTable.inputType this
+
+        member this.OutputType = ArcTable.outputType this
+
+        //member this.TryGetChildProtocolTypeOf(parentProtocolType : OntologyAnnotation) =
+        //    this.Protocols
+        //    |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType) then Some p else None)
+        //    |> Option.fromValueWithDefault []
+
+        //member this.TryGetChildProtocolTypeOf(parentProtocolType : OntologyAnnotation, obo : Obo.OboOntology) =
+        //    this.Protocols
+        //    |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType, obo) then Some p else None)
+        //    |> Option.fromValueWithDefault []
 
         member this.Item (i : int) =
             this.Rows.[i]
@@ -157,10 +224,10 @@ module ArcTableExtensions =
         member this.Item (input : string) =
             let row = 
                 this.Rows 
-                |> List.tryFind (fun r -> r.Input = input)
+                |> List.tryFind (CRow.inputName >> (=) input)
             match row with
             | Some r -> r
-            | None -> failwith $"Sheet \"{this.SheetName}\" does not contain row with input \"{input}\""
+            | None -> failwith $"Sheet \"{this.Name}\" does not contain row with input \"{input}\""
 
         member this.RowCount =
             this.Rows 
@@ -168,18 +235,18 @@ module ArcTableExtensions =
 
         member this.InputNames =
             this.Rows 
-            |> List.map (fun row -> row.Input)
+            |> List.map CRow.inputName
 
         member this.OutputNames =
             this.Rows 
-            |> List.map (fun row -> row.Output)
+            |> List.map CRow.outputName
     
         member this.Inputs =
             this.Rows 
-            |> List.map (fun row -> row.Input, row.InputType)
+            |> List.map (fun row -> CRow.inputName row, CRow.inputType row)
 
         member this.Outputs =
             this.Rows 
-            |> List.map (fun row -> row.Output,row.OutputType)
+            |> List.map (fun row -> CRow.outputName row, CRow.outputType row)
 
    

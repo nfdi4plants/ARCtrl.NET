@@ -3,44 +3,96 @@
 open ARCtrl.ISA
 open OntologyAnnotation
 open System.Text.Json.Serialization
+open System.Collections.Generic
 
+type ISAValue =
+    | Parameter of ProcessParameterValue
+    | Characteristic of MaterialAttributeValue
+    | Factor of FactorValue
+    | Component of Component
 
+    member this.MapCategory(f : OntologyAnnotation -> OntologyAnnotation) = 
+        match this with
+        | Parameter         p -> p.MapCategory(f) |> Parameter
+        | Characteristic    c -> c.MapCategory(f) |> Characteristic
+        | Factor            c -> c.MapCategory(f) |> Factor
+        | Component         c -> c.MapCategory(f) |> Component 
 
-/// 
-type KVElement =
-    {Header : CompositeHeader; Value : CompositeCell}
+    static member tryCompose (header : CompositeHeader) (cell : CompositeCell) =
+        if header.isCharacteristic then 
+            ARCtrl.ISA.ArcTableAux.JsonTypes.composeCharacteristicValue header cell 
+            |> Characteristic 
+            |> Some
+        elif header.isFactor then
+            ARCtrl.ISA.ArcTableAux.JsonTypes.composeFactorValue header cell
+            |> Factor
+            |> Some
+        elif header.isComponent then
+            ARCtrl.ISA.ArcTableAux.JsonTypes.composeComponent header cell
+            |> Component
+            |> Some
+        elif header.isParameter then
+            ARCtrl.ISA.ArcTableAux.JsonTypes.composeParameterValue header cell
+            |> Parameter
+            |> Some
+        else None
+
 
 
 [<AutoOpen>]
-module KVElementExtensions = 
+module ISAValueExtensions = 
 
-    type KVElement with
+    type ISAValue with
 
         /// Returns true, if the value is a characteristic value
         member this.IsCharacteristicValue =
-            this.Header.isCharacteristic
+            match this with
+            | Characteristic _  -> true
+            | _                 -> false
 
         /// Returns true, if the value is a parameter value
         member this.IsParameterValue =
-            this.Header.isParameter
+            match this with
+            | Parameter _   -> true
+            | _             -> false
 
         /// Returns true, if the value is a factor value
         member this.IsFactorValue =
-            this.Header.isFactor
+            match this with
+            | Factor _  -> true
+            | _         -> false
             
         /// Returns true, if the value is a characteristic value
         member this.IsComponent =
-            this.Header.isComponent
+            match this with
+            | Component _  -> true
+            | _         -> false
 
-        /// Returns the ontology of the category of the KVElement
+        /// Returns the ontology of the category of the ISAValue
         member this.Category =
-            this.Header
+            match this with
+            | Parameter p       -> try p.Category.Value.ParameterName.Value         with | _ -> failwith $"Parameter does not contain category"
+            | Characteristic c  -> try c.Category.Value.CharacteristicType.Value    with | _ -> failwith $"Characteristic does not contain category"
+            | Factor f          -> try f.Category.Value.FactorType.Value            with | _ -> failwith $"Factor does not contain category"
+            | Component c       -> try c.ComponentType.Value                        with | _ -> failwith $"Component does not contain category"
 
-        /// Returns the ontology of the unit of the KVElement
+        /// Returns the ontology of the category of the ISAValue
+        member this.TryCategory =
+            match this with
+            | Parameter p       -> p.Category |> Option.bind (fun c -> c.ParameterName)
+            | Characteristic c  -> c.Category |> Option.bind (fun c -> c.CharacteristicType)
+            | Factor f          -> f.Category |> Option.bind (fun c -> c.FactorType)
+            | Component c       -> c.ComponentType
+
+        /// Returns the ontology of the unit of the ISAValue
         member this.Unit =
-            this.Value
+            match this with
+            | Parameter p       -> try p.Unit.Value          with | _ -> failwith $"Parameter {p.NameText} does not contain unit"
+            | Characteristic c  -> try c.Unit.Value          with | _ -> failwith $"Characteristic {c.NameText} does not contain unit"
+            | Factor f          -> try f.Unit.Value          with | _ -> failwith $"Factor {f.NameText} does not contain unit"
+            | Component c       -> try c.ComponentUnit.Value with | _ -> failwith $"Component {c.NameText} does not contain unit"
 
-        /// Returns the ontology of the unit of the KVElement
+        /// Returns the ontology of the unit of the ISAValue
         member this.TryUnit =
             match this with
             | Parameter p       -> p.Unit       
@@ -48,7 +100,7 @@ module KVElementExtensions =
             | Factor f          -> f.Unit         
             | Component c       -> c.ComponentUnit
 
-        /// Returns the value of the KVElement
+        /// Returns the value of the ISAValue
         member this.Value =
             match this with
             | Parameter p       -> try p.Value.Value            with | _ -> failwith $"Parameter {p.NameText} does not contain value"
@@ -56,7 +108,7 @@ module KVElementExtensions =
             | Factor f          -> try f.Value.Value            with | _ -> failwith $"Factor {f.NameText} does not contain value"
             | Component c       -> try c.ComponentValue.Value   with | _ -> failwith $"Component {c.NameText} does not contain value"
 
-        /// Returns the value of the KVElement
+        /// Returns the value of the ISAValue
         member this.TryValue =
             match this with
             | Parameter p       -> try Some p.Value.Value           with | _ -> None
@@ -64,7 +116,7 @@ module KVElementExtensions =
             | Factor f          -> try Some f.Value.Value           with | _ -> None
             | Component c       -> try Some c.ComponentValue.Value  with | _ -> None
 
-        /// Returns true, if the KVElement has a unit
+        /// Returns true, if the ISAValue has a unit
         member this.HasUnit =
             match this with
             | Parameter p       -> p.Unit.IsSome
@@ -72,7 +124,7 @@ module KVElementExtensions =
             | Factor f          -> f.Unit.IsSome
             | Component c       -> c.ComponentUnit.IsSome
 
-        /// Returns true, if the KVElement has a value
+        /// Returns true, if the ISAValue has a value
         member this.HasValue =
             match this with
             | Parameter p       -> p.Value.IsSome
@@ -80,7 +132,7 @@ module KVElementExtensions =
             | Factor f          -> f.Value.IsSome
             | Component c       -> c.ComponentValue.IsSome
 
-        /// Returns true, if the KVElement has a category
+        /// Returns true, if the ISAValue has a category
         member this.HasCategory = 
             match this with
             | Parameter p       -> p.Category.IsSome

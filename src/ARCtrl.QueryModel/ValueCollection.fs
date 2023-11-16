@@ -8,10 +8,10 @@ open System.IO
 open System.Collections.Generic
 open System.Collections
 
-/// Contains queryable KVElements (Parameters, Factors, Characteristics)
-type ValueCollection(values : KVElement list) =
+/// Contains queryable ISAValues (Parameters, Factors, Characteristics)
+type ValueCollection(values : ISAValue list) =
     
-    new (values : KVElement seq) =
+    new (values : ISAValue seq) =
         ValueCollection(values |> Seq.toList)
 
     /// Returns the nth Item in the collection
@@ -25,12 +25,12 @@ type ValueCollection(values : KVElement list) =
     /// Returns an Item in the collection with the given header category
     member this.Item(category : OntologyAnnotation) = 
         values 
-        |> List.pick (fun v -> if v.Category.Category = category then Some v else None)
+        |> List.pick (fun v -> if v.Category = category then Some v else None)
 
     /// Returns an Item in the collection whichs header category is a child of the given parent category
     member this.ItemWithParent(parentCategory : OntologyAnnotation) = 
         values 
-        |> List.pick (fun v -> if v.Category.Category.IsChildTermOf(parentCategory) then Some v else None)
+        |> List.pick (fun v -> if v.Category.IsChildTermOf(parentCategory) then Some v else None)
 
     /// Returns the nth Item in the collection if it exists, else returns None
     member this.TryItem(i : int)  = if values.Length > i then Some values.[i] else None
@@ -43,12 +43,12 @@ type ValueCollection(values : KVElement list) =
     /// Returns an Item in the collection with the given header category, else returns None
     member this.TryItem(category : OntologyAnnotation) = 
         values 
-        |> List.tryPick (fun v -> if v.Category.Category = category then Some v else None)
+        |> List.tryPick (fun v -> if v.Category = category then Some v else None)
 
     /// Returns an Item in the collection whichs header category is a child of the given parent category, else returns None
     member this.TryItemWithParent(parentCategory : OntologyAnnotation) = 
         values 
-        |> List.tryPick (fun v -> if v.Category.Category.IsChildTermOf(parentCategory) then Some v else None)
+        |> List.tryPick (fun v -> if v.Category.IsChildTermOf(parentCategory) then Some v else None)
 
     /// Get the values as list
     member this.Values = values
@@ -102,7 +102,7 @@ type ValueCollection(values : KVElement list) =
         |> ValueCollection
 
     /// Return a new ValueCollection with only those values, for which the predicate applied on the header return true
-    member this.Filter(predicate : OntologyAnnotation -> bool) = values |> List.filter (fun v -> predicate v.Category.Category) |> ValueCollection
+    member this.Filter(predicate : OntologyAnnotation -> bool) = values |> List.filter (fun v -> predicate v.Category) |> ValueCollection
 
     /// Return a new ValueCollection with only those values, whichs header equals the given string
     member this.WithName(name : string) = 
@@ -159,23 +159,23 @@ type ValueCollection(values : KVElement list) =
     /// Equivalency is deduced from isA relationships in the SwateAPI
     member this.ContainsChildOf(parentCategory : OntologyAnnotation) =
         values
-        |> List.exists (fun v -> v.Category.Category.IsChildTermOf(parentCategory))
+        |> List.exists (fun v -> v.Category.IsChildTermOf(parentCategory))
 
     /// Returns true, if the ValueCollection contains a values, whichs header equals the given category
     member this.Contains(category : OntologyAnnotation) =
         values
-        |> List.exists (fun v -> v.Category.Category = category)
+        |> List.exists (fun v -> v.Category = category)
 
     /// Returns true, if the ValueCollection contains a values, whichs headername equals the given category
     member this.Contains(name : string) =
         values
         |> List.exists (fun v -> v.NameText = name)
 
-    interface IEnumerable<KVElement> with
+    interface IEnumerable<ISAValue> with
         member this.GetEnumerator() = (Seq.ofList values).GetEnumerator()
 
     interface IEnumerable with
-        member this.GetEnumerator() = (this :> IEnumerable<KVElement>).GetEnumerator() :> IEnumerator
+        member this.GetEnumerator() = (this :> IEnumerable<ISAValue>).GetEnumerator() :> IEnumerator
 
     static member (@) (ps1 : ValueCollection,ps2 : ValueCollection) = ps1.Values @ ps2.Values |> ValueCollection
 
@@ -190,26 +190,26 @@ module ValueCollectionExtensions =
         /// Return the number of values in the collection
         member this.Length = this.Values.Length
 
-        /// Return first KVElement in collection
+        /// Return first ISAValue in collection
         member this.First = this.Values.Head
 
-        /// Return first KVElement in collection if it exists, else returns None
+        /// Return first ISAValue in collection if it exists, else returns None
         member this.TryFirst = if this.IsEmpty then None else Some this.First
 
-        /// Return first KVElement in collection
+        /// Return first ISAValue in collection
         member this.Last = this.Values.[this.Length - 1]
 
-/// Contains queryable KVElements (Parameters, Factors, Characteristics)
-type IOValueCollection(values : KeyValuePair<string*string,KVElement> list) =
+/// Contains queryable ISAValues (Parameters, Factors, Characteristics)
+type IOValueCollection(values : KeyValuePair<string*string,ISAValue> list) =
 
     /// Returns the nth Item in the collection
     member this.Item(i : int)  = values.[i]
 
-    member this.Item(category : string) = values |> List.pick (fun kv -> if kv.Value.Category.NameText = category then Some kv.Key else None)
+    member this.Item(category : string) = values |> List.pick (fun kv -> if kv.Value.NameText = category then Some kv.Key else None)
 
     member this.Item(ioKey : string*string) = values |> List.pick (fun kv -> if ioKey = kv.Key then Some kv.Value else None)
 
-    member this.Item(category : OntologyAnnotation) = values |> List.pick (fun kv -> if kv.Value.Category.Category = category then Some kv.Key else None)
+    member this.Item(category : OntologyAnnotation) = values |> List.pick (fun kv -> if kv.Value.Category = category then Some kv.Key else None)
 
     member this.WithInput(inp : string) = 
         values |> List.choose (fun kv -> if (fst kv.Key) = inp then Some kv.Value else None)
@@ -276,7 +276,7 @@ type IOValueCollection(values : KeyValuePair<string*string,KVElement> list) =
 
     member this.WithCategory(category : OntologyAnnotation) = 
         values
-        |> List.filter (fun kv -> kv.Value.Category.Category = category)
+        |> List.filter (fun kv -> kv.Value.Category = category)
         |> IOValueCollection
 
     member this.WithName(name : string) = 
@@ -294,11 +294,11 @@ type IOValueCollection(values : KeyValuePair<string*string,KVElement> list) =
         |> List.groupBy (fun kv -> snd kv.Key)
                |> List.map (fun (sink,vals) -> sink, vals |> List.map (fun kv -> fst kv.Key,kv.Value))
     
-    interface IEnumerable<KeyValuePair<string*string,KVElement>> with
+    interface IEnumerable<KeyValuePair<string*string,ISAValue>> with
         member this.GetEnumerator() = (Seq.ofList values).GetEnumerator()
 
     interface IEnumerable with
-        member this.GetEnumerator() = (this :> IEnumerable<KeyValuePair<string*string,KVElement>>).GetEnumerator() :> IEnumerator
+        member this.GetEnumerator() = (this :> IEnumerable<KeyValuePair<string*string,ISAValue>>).GetEnumerator() :> IEnumerator
 
 [<AutoOpen>]
 module IOValueCollectionExtensions =
@@ -308,8 +308,8 @@ module IOValueCollectionExtensions =
         /// Return the number of values in the collection
         member this.Length = this.Values().Length
 
-        /// Return first KVElement in collection
+        /// Return first ISAValue in collection
         member this.First = this.Values().First
 
-        /// Return first KVElement in collection
+        /// Return first ISAValue in collection
         member this.Last = this.Values().Last

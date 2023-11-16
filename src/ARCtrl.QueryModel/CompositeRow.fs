@@ -2,6 +2,3 @@
 
 
 
-type Row =
-    { Input :  }
-

@@ -79,9 +79,9 @@ type ISAQueryBuilder () =
 
     /// Map all isa values in the collection to their category
     [<CustomOperation("selectCategory")>] 
-    member this.SelectCategory (source: QuerySource<KVElement, 'Q>) : QuerySource<OntologyAnnotation, 'Q> =
+    member this.SelectCategory (source: QuerySource<ISAValue, 'Q>) : QuerySource<OntologyAnnotation, 'Q> =
         addMessage $"get valueText"
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryCategory with
             | Option.Some t -> t
             | Option.None -> missingCategory(OntologyAnnotation.empty)
@@ -90,55 +90,55 @@ type ISAQueryBuilder () =
 
     /// Map all isa values in the collection to their value
     [<CustomOperation("selectValue")>] 
-    member this.SelectValue (source: QuerySource<KVElement, 'Q>) : QuerySource<Value, 'Q> =
+    member this.SelectValue (source: QuerySource<ISAValue, 'Q>) : QuerySource<Value, 'Q> =
         addMessage $"get valueText"
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryValue with
             | Option.Some t -> t
-            | Option.None -> missingValue(v.Category.Category)
+            | Option.None -> missingValue(v.Category)
             )
         )
 
     /// Map all isa values in the collection to their value text
     [<CustomOperation("selectValueText")>] 
-    member this.SelectValueText (source: QuerySource<KVElement, 'Q>) : QuerySource<string, 'Q> =
+    member this.SelectValueText (source: QuerySource<ISAValue, 'Q>) : QuerySource<string, 'Q> =
         addMessage $"get valueText"
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryValueText with
             | Option.Some t -> t
-            | Option.None -> missingValue(v.Category.Category)
+            | Option.None -> missingValue(v.Category)
             )
         )
 
     /// Map all isa values in the collection to their value with unit text
     [<CustomOperation("selectValueWithUnitText")>] 
-    member this.SelectValueWithUnitText (source: QuerySource<KVElement, 'Q>) : QuerySource<string, 'Q> =
+    member this.SelectValueWithUnitText (source: QuerySource<ISAValue, 'Q>) : QuerySource<string, 'Q> =
         addMessage $"get valueWithUnitText"
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryValueWithUnitText with
             | Option.Some t -> t
-            | Option.None -> missingValue(v.Category.Category)
+            | Option.None -> missingValue(v.Category)
             )
         )
 
     /// Map all isa values in the collection to synonymous values in the target ontology
     [<CustomOperation("asValueOfOntology")>] 
-    member this.AsValueOfOntology (source: QuerySource<KVElement, 'Q>, targetOntology) : QuerySource<KVElement, 'Q> =
+    member this.AsValueOfOntology (source: QuerySource<ISAValue, 'Q>, targetOntology) : QuerySource<ISAValue, 'Q> =
         addMessage $"as Value of target ontology \"{targetOntology}\""
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryGetAs(targetOntology,Obo.OboOntology.create [] []) with
             | Option.Some v -> v
-            | Option.None -> noSynonymInTargetOntology v.Category.Category targetOntology       
+            | Option.None -> noSynonymInTargetOntology v.Category targetOntology       
         ))
         
     /// Map all isa values in the collection to synonymous values in the target ontology
     [<CustomOperation("asValueOfOntology")>] 
-    member this.AsValueOfOntology (source: QuerySource<KVElement, 'Q>, obo : Obo.OboOntology ,targetOntology) : QuerySource<KVElement, 'Q> =
+    member this.AsValueOfOntology (source: QuerySource<ISAValue, 'Q>, obo : Obo.OboOntology ,targetOntology) : QuerySource<ISAValue, 'Q> =
         addMessage $"as Value of target ontology \"{targetOntology}\""
-        this.Select(source,(fun (v : KVElement) -> 
+        this.Select(source,(fun (v : ISAValue) -> 
             match v.TryGetAs(targetOntology,obo) with
             | Option.Some v -> v
-            | Option.None -> noSynonymInTargetOntology v.Category.Category targetOntology       
+            | Option.None -> noSynonymInTargetOntology v.Category targetOntology       
         ))
 
     // ---- Filter operators ----
@@ -150,19 +150,19 @@ type ISAQueryBuilder () =
         
     /// Returns a collection containing only the isa values whose category has the given name.
     [<CustomOperation("whereName")>] 
-    member this.WhereName (source: QuerySource<KVElement, 'Q>, name : string) : QuerySource<KVElement, 'Q> =
+    member this.WhereName (source: QuerySource<ISAValue, 'Q>, name : string) : QuerySource<ISAValue, 'Q> =
         addMessage $"with isa category header name \"{name}\""
-        let result = this.Where(source,(fun (v : KVElement) -> v.NameText = name))
+        let result = this.Where(source,(fun (v : ISAValue) -> v.NameText = name))
         if result.Source |> Seq.isEmpty then
-            missingCategory (OntologyAnnotation.fromString name "" "")
+            missingCategory (OntologyAnnotation.fromString(name))
         else 
             result
 
     /// Returns a collection containing only the isa values whose categorys equal the given parentCategory.
     [<CustomOperation("whereCategory")>] 
-    member this.WhereCategory (source: QuerySource<KVElement, 'Q>, category : OntologyAnnotation) : QuerySource<KVElement, 'Q> =
+    member this.WhereCategory (source: QuerySource<ISAValue, 'Q>, category : OntologyAnnotation) : QuerySource<ISAValue, 'Q> =
         addMessage $"with isa category header \"{category.NameText}\""
-        let result = this.Where(source,(fun (v : KVElement) -> v.Category = category))
+        let result = this.Where(source,(fun (v : ISAValue) -> v.Category = category))
         if result.Source |> Seq.isEmpty then
             missingCategory category
         else 
@@ -170,10 +170,10 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the isa values whose categorys equal the given parentCategory.
     [<CustomOperation("whereCategory")>] 
-    member this.WhereCategory (source: QuerySource<KVElement, 'Q>, name : string, ontologySource : string, annotationNumber : string) : QuerySource<KVElement, 'Q> =
+    member this.WhereCategory (source: QuerySource<ISAValue, 'Q>, name : string, ontologySource : string, annotationNumber : string) : QuerySource<ISAValue, 'Q> =
         addMessage $"with isa category header \"{name}\""
-        let category = OntologyAnnotation.fromString name ontologySource annotationNumber
-        let result = this.Where(source,(fun (v : KVElement) -> v.Category = category))
+        let category = OntologyAnnotation.fromString(name,annotationNumber,ontologySource)
+        let result = this.Where(source,(fun (v : ISAValue) -> v.Category = category))
         if result.Source |> Seq.isEmpty then
             missingCategory category
         else 
@@ -181,9 +181,9 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the isa values whose categorys are child categories to the given parentCategory.
     [<CustomOperation("whereCategoryIsChildOf")>] 
-    member this.WhereCategoryIsChildOf (source: QuerySource<KVElement, 'Q>, obo : Obo.OboOntology, category : ISADotNet.OntologyAnnotation) : QuerySource<KVElement, 'Q> =
+    member this.WhereCategoryIsChildOf (source: QuerySource<ISAValue, 'Q>, obo : Obo.OboOntology, category : OntologyAnnotation) : QuerySource<ISAValue, 'Q> =
         addMessage $"with parent isa category \"{category.NameText}\""
-        let result = this.Where(source,(fun (v : KVElement) -> v.HasParentCategory(category,obo)))
+        let result = this.Where(source,(fun (v : ISAValue) -> v.HasParentCategory(category,obo)))
         if result.Source |> Seq.isEmpty then
             missingCategory category
         else 
@@ -191,9 +191,9 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the isa values whose categorys are child categories to the given parentCategory.
     [<CustomOperation("whereCategoryIsChildOf")>] 
-    member this.WhereCategoryIsChildOf (source: QuerySource<KVElement, 'Q>, category : ISADotNet.OntologyAnnotation) : QuerySource<KVElement, 'Q> =
+    member this.WhereCategoryIsChildOf (source: QuerySource<ISAValue, 'Q>, category : OntologyAnnotation) : QuerySource<ISAValue, 'Q> =
         addMessage $"with parent isa category \"{category.NameText}\""
-        let result = this.Where(source,(fun (v : KVElement) -> v.HasParentCategory(category)))
+        let result = this.Where(source,(fun (v : ISAValue) -> v.HasParentCategory(category)))
         if result.Source |> Seq.isEmpty then
             missingCategory category
         else 
@@ -319,7 +319,7 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the protocols whose inputs and outputs are data files.
     [<CustomOperation("whereSoftwareProtocol")>] 
-    member this.WhereSoftwareProtocol (source: QuerySource<QSheet, 'Q>) : QuerySource<QSheet, 'Q> =
+    member this.WhereSoftwareProtocol (source: QuerySource<ArcTable, 'Q>) : QuerySource<ArcTable, 'Q> =
         addMessage $"whereSoftwareProtocol"
         let ioTypeIsData (ioType : IOType option) =
             match ioType with
@@ -327,7 +327,9 @@ type ISAQueryBuilder () =
             | None -> false
         this.Where(
             source,
-            (fun (v : QSheet) -> 
+            (fun (v : ArcTable) -> 
+                v.TryGetInputColumn
+                CompositeHeader.Date.
                 v.Inputs |> List.exists (snd >> ioTypeIsData)
                 && (v.Outputs |> List.exists (snd >> ioTypeIsData))
             )

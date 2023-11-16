@@ -8,8 +8,26 @@ open System.IO
 open System.Collections.Generic
 open System.Collections
 
+
+
 [<AutoOpen>]
 module ArcTables = 
+
+    type IOType with
+        member this.isSource = match this with | IOType.Source -> true | _ -> false
+
+        member this.isSample = match this with | IOType.Sample -> true | _ -> false
+
+        member this.isMaterial = match this with | IOType.Material -> true | _ -> false
+
+        member this.isRawData = match this with | IOType.RawDataFile -> true | _ -> false
+
+        member this.isProcessedData = match this with | IOType.DerivedDataFile -> true | _ -> false
+
+        member this.isImage = match this with | IOType.ImageFile -> true | _ -> false
+
+        member this.isData = this.isProcessedData || this.isRawData || this.isImage
+
 
     /// Type representing a queryable collection of processes, which model the experimental graph
     type ArcTables with
@@ -19,41 +37,43 @@ module ArcTables =
             |> ResizeArray
             |> ArcTables 
 
-        member this.TryGetChildProtocolOf(parentProtocolType : OntologyAnnotation) =
-            this.Sheets
-            |> List.collect (fun s -> s.Protocols)
-            |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType) then Some p else None)
-            |> Option.fromValueWithDefault []
+        //member this.TryGetChildProtocolOf(parentProtocolType : OntologyAnnotation) =
+        //    this.Sheets
+        //    |> List.collect (fun s -> s.Protocols)
+        //    |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType) then Some p else None)
+        //    |> Option.fromValueWithDefault []
 
-        member this.TryGetChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : Obo.OboOntology) =
-            this.Sheets
-            |> List.collect (fun s -> s.Protocols)
-            |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType, obo) then Some p else None)
-            |> Option.fromValueWithDefault []
+        //member this.TryGetChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : Obo.OboOntology) =
+        //    this.Sheets
+        //    |> List.collect (fun s -> s.Protocols)
+        //    |> List.choose (fun p -> if p.IsChildProtocolTypeOf(parentProtocolType, obo) then Some p else None)
+        //    |> Option.fromValueWithDefault []
 
         /// Returns the list of all nodes (sources, samples, data) in the ProcessSequence
         static member getNodes (ps : #ArcTables) =
-            ps.Protocols 
-            |> List.collect (fun p -> 
+            ps.Tables 
+            |> Seq.collect (fun p -> 
                 p.Rows 
-                |> List.collect (fun r -> 
+                |> Seq.collect (fun r -> 
                     [
-                        QNode(r.Input,r.InputType.Value,ps)
-                        QNode(r.Output,r.OutputType.Value,ps)
+                        QNode(r.InputName,r.InputType,ps)
+                        QNode(r.OutputName,r.OutputType,ps)
                     ]
                 )
             )
+            |> Seq.toList
             |> List.distinct     
 
         /// Returns a new process sequence, only with those rows that contain either an educt or a product entity of the given node (or entity)
         static member getSubTreeOf (node : string) (ps : #ArcTables) =
             let rec collectForwardNodes nodes =
                 let newNodes = 
-                    ps.Sheets
-                    |> List.collect (fun sheet ->
+                    ps.Tables
+                    |> Seq.collect (fun sheet ->
                         sheet.Rows 
-                        |> List.choose (fun r -> if List.contains r.Input nodes then Some r.Output else None)
+                        |> Seq.choose (fun r -> if List.contains r.InputName nodes then Some r.OutputName else None)
                     )
+                    |> Seq.toList
                     |> List.append nodes 
                     |> List.distinct
                 
@@ -62,11 +82,12 @@ module ArcTables =
 
             let rec collectBackwardNodes nodes =
                 let newNodes = 
-                    ps.Sheets
-                    |> List.collect (fun sheet ->
+                    ps.Tables
+                    |> Seq.collect (fun sheet ->
                         sheet.Rows 
-                        |> List.choose (fun r -> if List.contains r.Output nodes then Some r.Input else None)
+                        |> Seq.choose (fun r -> if List.contains r.Output nodes then Some r.Input else None)
                     )
+                    |> Seq.toList
                     |> List.append nodes 
                     |> List.distinct
                        
@@ -76,27 +97,30 @@ module ArcTables =
             let forwardNodes = collectForwardNodes [node]
             let backwardNodes = collectBackwardNodes [node]
 
-            ps.Sheets
-            |> List.map (fun sheet ->
-                {sheet 
-                    with Rows = 
-                            sheet.Rows
-                            |> List.filter (fun r ->
-                                List.contains r.Input forwardNodes 
-                                || (List.contains r.Output backwardNodes)
+            let arcTables = ps |> Seq.map (fun t -> t.Copy()) |> Seq.toList |> ResizeArray
 
-                            )
-
-                }
+            arcTables
+            |> ResizeArray.map (fun t ->
+                (t.GetOutputColumn().Cells)
+                |> Seq.zip (t.GetInputColumn().Cells)
+                |> Seq.indexed 
+                |> Seq.choose (fun (i,(inp,out)) ->
+                    if Seq.contains inp.AsFreeText forwardNodes || (Seq.contains out.AsFreeText backwardNodes) then
+                        None
+                    else Some i                              
+                )
+                |> Seq.toArray
+                |> t.RemoveRows
+                t
             )
             |> ArcTables
 
         /// Returns the names of all initial inputs final outputs of the processSequence, to which no processPoints
         static member getRootInputs (ps : #ArcTables) =
-            let inputs = ps.Protocols |> List.collect (fun p -> p.Rows |> List.map (fun r -> r.Input,r.InputType.Value))
-            let outputs =  ps.Protocols |> List.collect (fun p -> p.Rows |> List.map (fun r -> r.Output)) |> Set.ofList
+            let inputs = ps.Tables |> ResizeArray.collect (fun p -> p.Rows |> List.map (fun r -> r.Input,r.InputType))
+            let outputs =  ps.Tables |> ResizeArray.collect (fun p -> p.Rows |> List.map (fun r -> r.Output)) |> Set.ofSeq
             inputs
-            |> List.choose (fun (iname,it) -> 
+            |> ResizeArray.choose (fun (iname,it) -> 
                 if outputs.Contains iname then
                     None
                 else 
@@ -106,10 +130,10 @@ module ArcTables =
 
         /// Returns the names of all final outputs of the processSequence, which point to no further nodes
         static member getFinalOutputs (ps : #ArcTables) =
-            let inputs = ps.Protocols |> List.collect (fun p -> p.Rows |> List.map (fun r -> r.Input)) |> Set.ofList
-            let outputs =  ps.Protocols |> List.collect (fun p -> p.Rows |> List.map (fun r -> r.Output, r.OutputType.Value))
+            let inputs = ps.Tables |> ResizeArray.collect (fun p -> p.Rows |> List.map (fun r -> r.Input)) |> Set.ofSeq
+            let outputs =  ps.Tables |> ResizeArray.collect (fun p -> p.Rows |> List.map (fun r -> r.Output, r.OutputType))
             outputs
-            |> List.choose (fun (oname,ot) -> 
+            |> ResizeArray.choose (fun (oname,ot) -> 
                 if inputs.Contains oname then
                     None
                 else 
@@ -118,27 +142,28 @@ module ArcTables =
                 )
 
         /// Returns the names of all nodes for which the predicate reutrns true
-        static member getNodesBy (predicate : QueryModel.IOType -> bool) (ps : #ArcTables) =
-            ps.Protocols 
-            |> List.collect (fun p -> 
+        static member getNodesBy (predicate : IOType -> bool) (ps : #ArcTables) =
+            ps.Tables 
+            |> ResizeArray.collect (fun p -> 
                 p.Rows 
                 |> List.collect (fun r -> 
                     [                   
-                        if predicate r.InputType.Value then QNode(r.Input, r.InputType.Value, ps); 
-                        if predicate r.OutputType.Value then  QNode(r.Output, r.InputType.Value, ps)
+                        if predicate r.InputType then QNode(r.Input, r.InputType, ps); 
+                        if predicate r.OutputType then  QNode(r.Output, r.InputType, ps)
                     ])
             )
-            |> List.distinct 
+            |> ResizeArray.distinct 
 
         /// Returns the names of all initial inputs final outputs of the processSequence, to which no processPoints, and for which the predicate returns true
-        static member getRootInputsBy (predicate : QueryModel.IOType -> bool) (ps : #ArcTables) =
+        static member getRootInputsBy (predicate : IOType -> bool) (ps : #ArcTables) =
             let mappings = 
-                ps.Protocols 
-                |> List.collect (fun p -> 
+                ps.Tables 
+                |> ResizeArray.collect (fun p -> 
                     p.Rows 
-                    |> List.map (fun r -> QNode(r.Input,r.InputType.Value,ps), QNode(r.Output,r.OutputType.Value,ps))
+                    |> List.map (fun r -> QNode(r.Input,r.InputType,ps), QNode(r.Output,r.OutputType,ps))
                     |> List.distinct
                 ) 
+                |> Seq.toList
                 |> List.groupBy fst 
                 |> List.map (fun (out,ins) -> out, ins |> List.map snd)
                 |> Map.ofList
@@ -154,17 +179,18 @@ module ArcTables =
                     let nextSearchEntities = nonTargs |> List.collect (fun en -> Map.tryFind en mappings |> Option.defaultValue [])
                     loop nextSearchEntities targs
 
-            loop (ArcTables.getRootInputs ps) []
+            loop (ArcTables.getRootInputs ps |> List.ofSeq) []
 
         /// Returns the names of all final outputs of the processSequence, which point to no further nodes, and for which the predicate returns true
-        static member getFinalOutputsBy (predicate : QueryModel.IOType -> bool) (ps : #ArcTables) =
+        static member getFinalOutputsBy (predicate : IOType -> bool) (ps : #ArcTables) =
             let mappings = 
-                ps.Protocols 
-                |> List.collect (fun p -> 
+                ps.Tables 
+                |> ResizeArray.collect (fun p -> 
                     p.Rows 
-                    |> List.map (fun r -> QNode(r.Output,r.OutputType.Value,ps), QNode(r.Input,r.InputType.Value,ps))
+                    |> List.map (fun r -> QNode(r.Output,r.OutputType,ps), QNode(r.Input,r.InputType,ps))
                     |> List.distinct
                 ) 
+                |> Seq.toList
                 |> List.groupBy fst 
                 |> List.map (fun (out,ins) -> out, ins |> List.map snd)
                 |> Map.ofList  
@@ -181,34 +207,34 @@ module ArcTables =
                     let nextSearchEntities = nonTargs |> List.collect (fun en -> Map.tryFind en mappings |> Option.defaultValue [])
                     loop nextSearchEntities targs
 
-            loop (ArcTables.getFinalOutputs ps) []
+            loop (ArcTables.getFinalOutputs ps |> List.ofSeq) []
 
         /// Returns the names of all nodes processSequence, which are connected to the given node and for which the predicate returns true
-        static member getNodesOfBy (predicate : QueryModel.IOType -> bool) (node : string) (ps : #ArcTables) =
+        static member getNodesOfBy (predicate : IOType -> bool) (node : string) (ps : #ArcTables) =
             ArcTables.getSubTreeOf node ps
             |> ArcTables.getNodesBy predicate
 
         /// Returns the initial inputs final outputs of the assay, to which no processPoints, which are connected to the given node and for which the predicate returns true
-        static member getRootInputsOfBy (predicate : QueryModel.IOType -> bool) (node : string) (ps : #ArcTables) =
+        static member getRootInputsOfBy (predicate : IOType -> bool) (node : string) (ps : #ArcTables) =
             ArcTables.getSubTreeOf node ps
             |> ArcTables.getRootInputsBy predicate
 
         /// Returns the final outputs of the assay, which point to no further nodes, which are connected to the given node and for which the predicate returns true
-        static member getFinalOutputsOfBy (predicate : QueryModel.IOType -> bool) (node : string) (ps : #ArcTables) =
+        static member getFinalOutputsOfBy (predicate : IOType -> bool) (node : string) (ps : #ArcTables) =
             ArcTables.getSubTreeOf node ps
             |> ArcTables.getFinalOutputsBy predicate
        
         /// Returns the previous values of the given node
         static member getPreviousValuesOf (ps : #ArcTables) (node : string) =
             let mappings = 
-                ps.Protocols 
-                |> List.collect (fun p -> 
+                ps.Tables 
+                |> ResizeArray.collect (fun p -> 
                     p.Rows 
                     |> List.map (fun r -> r.Output,r)
                     |> List.distinct
                 ) 
 
-                |> Map.ofList
+                |> Map.ofSeq
             let rec loop values lastState state = 
                 if lastState = state then values 
                 else
@@ -216,7 +242,7 @@ module ArcTables =
                         state 
                         |> List.map (fun s -> 
                             mappings.TryFind s 
-                            |> Option.map (fun r -> r.Input,r.Vals)
+                            |> Option.map (fun r -> r.Input,r.Values |> Seq.toList)
                             |> Option.defaultValue (s,[])
                         )
                         |> List.unzip
@@ -228,14 +254,14 @@ module ArcTables =
         /// Returns the succeeding values of the given node
         static member getSucceedingValuesOf (ps : #ArcTables) (sample : string) =
             let mappings = 
-                ps.Protocols 
-                |> List.collect (fun p -> 
+                ps.Tables 
+                |> ResizeArray.collect (fun p -> 
                     p.Rows 
                     |> List.map (fun r -> r.Input,r)
                     |> List.distinct
                 ) 
 
-                |> Map.ofList
+                |> Map.ofSeq
             let rec loop values lastState state = 
                 if lastState = state then values 
                 else
@@ -243,7 +269,7 @@ module ArcTables =
                         state 
                         |> List.map (fun s -> 
                             mappings.TryFind s 
-                            |> Option.map (fun r -> r.Output,r.Vals)
+                            |> Option.map (fun r -> r.Output,r.Values |> Seq.toList)
                             |> Option.defaultValue (s,[])
                         )
                         |> List.unzip
@@ -257,80 +283,82 @@ module ArcTables =
             match protocolName with
             | Some pn ->
                 ps.Tables
-                |> Seq.map (fun s -> 
-                    if s.Name = pn then 
-                        s
-                    else 
-                        {s with Rows = s.Rows |> List.map (fun r -> {r with Vals = []})}
+                |> ResizeArray.filter (fun t -> 
+                    t.Name = pn
+
+                    //if s.Name = pn then 
+                    //    s
+                    //else 
+                    //    {s with Rows = s.Rows |> List.map (fun r -> {r with Vals = []})}
                 )
                 |> ArcTables                    
-            | None -> ps.Sheets |> ArcTables   
+            | None -> ps.Tables |> ArcTables   
 
-        /// Returns an IOValueCollection, where for each Value the closest inputs and outputs are used
-        member this.Nearest = 
-            this.Sheets
-            |> List.collect (fun sheet -> sheet.Values |> Seq.toList)
-            |> IOValueCollection
+        ///// Returns an IOValueCollection, where for each Value the closest inputs and outputs are used
+        //member this.Nearest = 
+        //    this.Tables
+        //    |> List.collect (fun sheet -> sheet.Values |> Seq.toList)
+        //    |> IOValueCollection
    
-        /// Returns an IOValueCollection, where for each Value the global inputs and closest outputs are used
-        member this.SinkNearest = 
-            this.Sheets
-            |> List.collect (fun sheet -> 
-                sheet.Rows
-                |> List.collect (fun r ->               
+        ///// Returns an IOValueCollection, where for each Value the global inputs and closest outputs are used
+        //member this.SinkNearest = 
+        //    this.Sheets
+        //    |> List.collect (fun sheet -> 
+        //        sheet.Rows
+        //        |> List.collect (fun r ->               
                 
-                    ArcTables.getRootInputsOfBy (fun _ -> true) r.Input this
-                    |> List.distinct
-                    |> List.collect (fun inp -> 
-                        r.Vals
-                        |> List.map (fun v -> 
-                            KeyValuePair((inp.Name,r.Output),v)
-                        )
-                    )
-                )
-            )
-            |> IOValueCollection
+        //            ArcTables.getRootInputsOfBy (fun _ -> true) r.Input this
+        //            |> List.distinct
+        //            |> List.collect (fun inp -> 
+        //                r.Vals
+        //                |> List.map (fun v -> 
+        //                    KeyValuePair((inp.Name,r.Output),v)
+        //                )
+        //            )
+        //        )
+        //    )
+        //    |> IOValueCollection
 
-        /// Returns an IOValueCollection, where for each Value the closest inputs and global outputs are used
-        member this.SourceNearest = 
-            this.Sheets
-            |> List.collect (fun sheet -> 
-                sheet.Rows
-                |> List.collect (fun r ->               
+        ///// Returns an IOValueCollection, where for each Value the closest inputs and global outputs are used
+        //member this.SourceNearest = 
+        //    this.Sheets
+        //    |> List.collect (fun sheet -> 
+        //        sheet.Rows
+        //        |> List.collect (fun r ->               
                 
-                    ArcTables.getFinalOutputsOfBy (fun _ -> true) r.Output this 
-                    |> List.distinct
-                    |> List.collect (fun out -> 
-                        r.Vals
-                        |> List.map (fun v -> 
-                            KeyValuePair((r.Input,out.Name),v)
-                        )
-                    )
-                )
-            )
-            |> IOValueCollection
+        //            ArcTables.getFinalOutputsOfBy (fun _ -> true) r.Output this 
+        //            |> List.distinct
+        //            |> List.collect (fun out -> 
+        //                r.Vals
+        //                |> List.map (fun v -> 
+        //                    KeyValuePair((r.Input,out.Name),v)
+        //                )
+        //            )
+        //        )
+        //    )
+        //    |> IOValueCollection
 
-        /// Returns an IOValueCollection, where for each Value the global inputs and outputs are used
-        member this.Global =
-            this.Sheets
-            |> List.collect (fun sheet -> 
-                sheet.Rows
-                |> List.collect (fun r ->  
-                    let outs = ArcTables.getFinalOutputsOfBy (fun _ -> true) r.Output this |> List.distinct
-                    let inps = ArcTables.getRootInputsOfBy (fun _ -> true) r.Input this |> List.distinct
-                    outs
-                    |> List.collect (fun out -> 
-                        inps
-                        |> List.collect (fun inp ->
-                            r.Vals
-                            |> List.map (fun v -> 
-                                KeyValuePair((inp.Name,out.Name),v)
-                            )
-                        )
-                    )
-                )
-            )
-            |> IOValueCollection
+        ///// Returns an IOValueCollection, where for each Value the global inputs and outputs are used
+        //member this.Global =
+        //    this.Sheets
+        //    |> List.collect (fun sheet -> 
+        //        sheet.Rows
+        //        |> List.collect (fun r ->  
+        //            let outs = ArcTables.getFinalOutputsOfBy (fun _ -> true) r.Output this |> List.distinct
+        //            let inps = ArcTables.getRootInputsOfBy (fun _ -> true) r.Input this |> List.distinct
+        //            outs
+        //            |> List.collect (fun out -> 
+        //                inps
+        //                |> List.collect (fun inp ->
+        //                    r.Vals
+        //                    |> List.map (fun v -> 
+        //                        KeyValuePair((inp.Name,out.Name),v)
+        //                    )
+        //                )
+        //            )
+        //        )
+        //    )
+        //    |> IOValueCollection
 
         /// Returns the names of all nodes in the Process sequence
         member this.NodesOf(node : QNode) =
@@ -464,24 +492,26 @@ module ArcTables =
         ///
         /// If a protocol name is given, returns only the values of the processes that implement this protocol
         member this.Values(?ProtocolName) = 
-            (ArcTables.onlyValuesOfProtocol this ProtocolName).Sheets
-            |> List.collect (fun s -> s.Values.Values().Values)
+            (ArcTables.onlyValuesOfProtocol this ProtocolName).Tables
+            |> ResizeArray.collect (fun s ->
+                s.ISAValues.Values().Values
+            )
             |> ValueCollection
 
         /// Returns all values in the process sequence whose header matches the given category
         ///
         /// If a protocol name is given, returns only the values of the processes that implement this protocol
         member this.Values(ontology : OntologyAnnotation, ?ProtocolName) = 
-            (ArcTables.onlyValuesOfProtocol this ProtocolName).Sheets
-            |> List.collect (fun s -> s.Values.Values().WithCategory(ontology).Values)
+            (ArcTables.onlyValuesOfProtocol this ProtocolName).Tables
+            |> ResizeArray.collect (fun s -> s.ISAValues.Values().WithCategory(ontology).Values)
             |> ValueCollection
 
         /// Returns all values in the process sequence whose header matches the given name
         ///
         /// If a protocol name is given, returns only the values of the processes that implement this protocol
         member this.Values(name : string, ?ProtocolName) = 
-            (ArcTables.onlyValuesOfProtocol this ProtocolName).Sheets
-            |> List.collect (fun s -> s.Values.Values().WithName(name).Values)
+            (ArcTables.onlyValuesOfProtocol this ProtocolName).Tables
+            |> ResizeArray.collect (fun s -> s.ISAValues.Values().WithName(name).Values)
             |> ValueCollection
 
         /// Returns all factor values in the process sequence
@@ -770,7 +800,7 @@ module ArcTables =
     type QNode(Name : string, IOType : IOType, ?ParentProcessSequence : ArcTables) =
     
         /// Returns the process sequence in which the node appears
-        member this.ParentProcessSequence = ParentProcessSequence |> Option.defaultValue (ArcTables([]))
+        member this.ParentProcessSequence = ParentProcessSequence |> Option.defaultValue (ArcTables(ResizeArray []))
 
         /// Identifying name of the node
         member this.Name = Name

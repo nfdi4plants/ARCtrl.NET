@@ -8,8 +8,6 @@ open FsSpreadsheet.DSL
 open ARCtrl.QueryModel
 open Errors
 open Helpers
-open ARCtrl
-open ARCtrl.Builder
 
 /// Should be opened for using ISA-Value querying DSL in combindation with FsSpreadsheet DSL.
 module Spreadsheet =
