@@ -22,7 +22,7 @@ module ARCExtensions =
                 contracts 
                 |> Array.map (fulfillReadContract arcPath)
 
-            arc.SetISAFromContracts(fulFilledContracts,true)
+            arc.SetISAFromContracts(fulFilledContracts)
             arc
 
     ///// Initializes the ARC-specific folder structure.

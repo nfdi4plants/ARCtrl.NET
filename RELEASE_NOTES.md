@@ -1,5 +1,14 @@
-### 1.0.0+72d58da (Released 2023-9-19)
+### 1.0.0+da0642b (Released 2023-11-2)
 * Additions:
+    * [[#da0642b](https://github.com/nfdi4plants/ARCtrl.NET/commit/da0642b71f8ca4a9e4344fbee0879fb0a61f5831)] add querymodel project from previous ISADotNet state
+    * [[#ac8fb85](https://github.com/nfdi4plants/ARCtrl.NET/commit/ac8fb8506310f8e2bf8d9b8a5d15b34251149b0e)] bump to 1.0.0-beta.1
+    * [[#70032b4](https://github.com/nfdi4plants/ARCtrl.NET/commit/70032b47f82a1177895d89ec314e44c357f95d0a)] add simple arc read-in test
+    * [[#132788e](https://github.com/nfdi4plants/ARCtrl.NET/commit/132788efe421ceb23526c40e7c2dceac5f1ded3f)] include simple test arc
+    * [[#c805976](https://github.com/nfdi4plants/ARCtrl.NET/commit/c80597620132a916d2fe05c8214e3cd58ec8c9e0)] add contract tests
+    * [[#41cdec5](https://github.com/nfdi4plants/ARCtrl.NET/commit/41cdec556c6f4d2d460bca25723a36fdd88706b9)] add arc write tests
+    * [[#7d65d95](https://github.com/nfdi4plants/ARCtrl.NET/commit/7d65d9595eded9390e842ac52c7bd1e9aea27356)] update arctrl reference to 1.0.0-alpha9
+    * [[#f3eda8e](https://github.com/nfdi4plants/ARCtrl.NET/commit/f3eda8e96a3a7791288c1b5975050742c1d803d9)] Merge pull request #9 from nfdi4plants/arctrl
+    * [[#ba3d2fa](https://github.com/nfdi4plants/ARCtrl.NET/commit/ba3d2fabe007d9ca2c8e07b62d02ddc5264306d0)] update arctrl reference to 1.0.0-alpha10
     * [[#72d58da](https://github.com/nfdi4plants/ARCtrl.NET/commit/72d58daddfdbe03f707db03bfc4edc6801dbd51b)] bump to 1.0.0-alpha2
     * [[#d06e12c](https://github.com/nfdi4plants/ARCtrl.NET/commit/d06e12cb08726cdd349ab2d77db4fe1314271cca)] bump to 1.0.0-alpha1
     * [[#2118bdd](https://github.com/nfdi4plants/ARCtrl.NET/commit/2118bdd326281ba955c755d77d562fa070ba9f7b)] add write function

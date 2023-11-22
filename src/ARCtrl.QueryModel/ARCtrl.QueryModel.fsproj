@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ResizeArray.fs" />
+    <Compile Include="OntologyAnnotation.fs" />
+    <Compile Include="Comment.fs" />
+    <Compile Include="Errors.fs" />
+    <Compile Include="Person.fs" />
+    <Compile Include="Category.fs" />
+    <Compile Include="Value.fs" />
+    <Compile Include="ValueCollection.fs" />
+    <Compile Include="CompositeRow.fs" />
+    <Compile Include="ArcTable.fs" />
+    <Compile Include="ArcTables.fs" />
+    <Compile Include="Assay.fs" />
+    <Compile Include="Study.fs" />
+    <Compile Include="Investigation.fs" />
+    <Compile Include="Linq\Helpers.fs" />
+    <Compile Include="Linq\QueryBuilder.fs" />
+    <Compile Include="Linq\Query.fs" />
+    <Compile Include="Linq\Spreadsheet.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ARCtrl" Version="1.0.0-beta.7" />
+    <PackageReference Include="OBO.NET" Version="0.4.2" />
+    <PackageReference Include="Swate.Api" Version="0.2.0" />
+    <PackageReference Update="FSharp.Core" Version="7.0.400" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="7.0.401" />
+  </ItemGroup>
+
+</Project>
