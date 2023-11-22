@@ -7,6 +7,7 @@ open System.IO
 
 open System.Collections.Generic
 open System.Collections
+open OBO.NET
 
 /// Contains queryable ISAValues (Parameters, Factors, Characteristics)
 type ValueCollection(values : ISAValue list) =
@@ -115,7 +116,7 @@ type ValueCollection(values : ISAValue list) =
     /// Return a new ValueCollection with only those values, whichs header equals the given category or an equivalent category
     ///
     /// Equivalency is deduced from XRef relationships in the given Ontology
-    member this.WithEquivalentCategory(equivalentCategory : OntologyAnnotation, ont : Obo.OboOntology) = 
+    member this.WithEquivalentCategory(equivalentCategory : OntologyAnnotation, ont : OboOntology) = 
         this.Filter (fun v -> v.IsEquivalentTo(equivalentCategory, ont))
 
     /// Return a new ValueCollection with only those values, whichs header equals the given category or its child categories
@@ -127,7 +128,7 @@ type ValueCollection(values : ISAValue list) =
     /// Return a new ValueCollection with only those values, whichs header equals the given category or its child categories
     ///
     /// Equivalency is deduced from isA relationships in the given Ontology
-    member this.WithChildCategory(childCategory : OntologyAnnotation, ont : Obo.OboOntology) = 
+    member this.WithChildCategory(childCategory : OntologyAnnotation, ont : OboOntology) = 
         this.Filter (fun v -> childCategory.IsChildTermOf(v, ont))
 
     /// Return a new ValueCollection with only those values, whichs header equals the given category or its parent categories
@@ -139,7 +140,7 @@ type ValueCollection(values : ISAValue list) =
     /// Return a new ValueCollection with only those values, whichs header equals the given category or its parent categories
     ///
     /// Equivalency is deduced from isA relationships in the given Ontology
-    member this.WithParentCategory(parentCategory : OntologyAnnotation, ont : Obo.OboOntology) = 
+    member this.WithParentCategory(parentCategory : OntologyAnnotation, ont : OboOntology) = 
         this.Filter (fun v -> v.IsChildTermOf(parentCategory,ont))
 
     /// Returns a new ValueCollection that contains no duplicate entries. 

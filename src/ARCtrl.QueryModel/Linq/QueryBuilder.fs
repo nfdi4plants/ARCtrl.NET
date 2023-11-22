@@ -10,7 +10,7 @@ open ARCtrl.ISA
 open ARCtrl.QueryModel
 open Errors
 open Helpers
-
+open OBO.NET
 
 type ISAQueryBuilder () =
     
@@ -126,14 +126,14 @@ type ISAQueryBuilder () =
     member this.AsValueOfOntology (source: QuerySource<ISAValue, 'Q>, targetOntology) : QuerySource<ISAValue, 'Q> =
         addMessage $"as Value of target ontology \"{targetOntology}\""
         this.Select(source,(fun (v : ISAValue) -> 
-            match v.TryGetAs(targetOntology,Obo.OboOntology.create [] []) with
+            match v.TryGetAs(targetOntology,OboOntology.create [] []) with
             | Option.Some v -> v
             | Option.None -> noSynonymInTargetOntology v.Category targetOntology       
         ))
         
     /// Map all isa values in the collection to synonymous values in the target ontology
     [<CustomOperation("asValueOfOntology")>] 
-    member this.AsValueOfOntology (source: QuerySource<ISAValue, 'Q>, obo : Obo.OboOntology ,targetOntology) : QuerySource<ISAValue, 'Q> =
+    member this.AsValueOfOntology (source: QuerySource<ISAValue, 'Q>, obo : OboOntology ,targetOntology) : QuerySource<ISAValue, 'Q> =
         addMessage $"as Value of target ontology \"{targetOntology}\""
         this.Select(source,(fun (v : ISAValue) -> 
             match v.TryGetAs(targetOntology,obo) with
@@ -181,7 +181,7 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the isa values whose categorys are child categories to the given parentCategory.
     [<CustomOperation("whereCategoryIsChildOf")>] 
-    member this.WhereCategoryIsChildOf (source: QuerySource<ISAValue, 'Q>, obo : Obo.OboOntology, category : OntologyAnnotation) : QuerySource<ISAValue, 'Q> =
+    member this.WhereCategoryIsChildOf (source: QuerySource<ISAValue, 'Q>, obo : OboOntology, category : OntologyAnnotation) : QuerySource<ISAValue, 'Q> =
         addMessage $"with parent isa category \"{category.NameText}\""
         let result = this.Where(source,(fun (v : ISAValue) -> v.HasParentCategory(category,obo)))
         if result.Source |> Seq.isEmpty then
@@ -321,15 +321,11 @@ type ISAQueryBuilder () =
     [<CustomOperation("whereSoftwareProtocol")>] 
     member this.WhereSoftwareProtocol (source: QuerySource<ArcTable, 'Q>) : QuerySource<ArcTable, 'Q> =
         addMessage $"whereSoftwareProtocol"
-        let ioTypeIsData (ioType : IOType option) =
-            match ioType with
-            | Option.Some iot -> iot.isData
-            | None -> false
+        let ioTypeIsData (ioType : IOType) =
+            ioType.isData
         this.Where(
             source,
-            (fun (v : ArcTable) -> 
-                v.TryGetInputColumn
-                CompositeHeader.Date.
+            (fun (v : ArcTable) ->                 
                 v.Inputs |> List.exists (snd >> ioTypeIsData)
                 && (v.Outputs |> List.exists (snd >> ioTypeIsData))
             )
@@ -337,11 +333,11 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the protocols whose protocol type is a child category to the given parentCategory.
     [<CustomOperation("whereProtocolTypeIsChildOf")>] 
-    member this.WhereProtocolTypeIsChildOf (source: QuerySource<QSheet, 'Q>, obo : Obo.OboOntology, category : ISADotNet.OntologyAnnotation) : QuerySource<QSheet, 'Q> =
+    member this.WhereProtocolTypeIsChildOf (source: QuerySource<ArcTable, 'Q>, obo : OboOntology, category : OntologyAnnotation) : QuerySource<ArcTable, 'Q> =
         addMessage $"with parent isa category {category.NameText}"
         let result = this.Where(
             source,
-            (fun (v : QSheet) -> v.Protocols.Head.IsChildProtocolOf(category,obo))
+            (fun (v : ArcTable) -> v.GetProtocols().Head.IsChildProtocolOf(category,obo))
         )
         if result.Source |> Seq.isEmpty then
             missingProtocolWithType category
@@ -350,18 +346,19 @@ type ISAQueryBuilder () =
 
     /// Returns a collection containing only the protocols whose protocol type is a child category to the given parentCategory.
     [<CustomOperation("whereProtocolTypeIsChildOf")>] 
-    member this.WhereProtocolTypeIsChildOf (source: QuerySource<QSheet, 'Q>, obo : Obo.OboOntology, name : string, sourceName : string, accessionNumber : string) : QuerySource<QSheet, 'Q> =
-        let oa = OntologyAnnotation.fromString name sourceName accessionNumber
+    member this.WhereProtocolTypeIsChildOf (source: QuerySource<ArcTable, 'Q>, obo : OboOntology, name : string, sourceName : string, accessionNumber : string) : QuerySource<ArcTable, 'Q> =
+        let oa = OntologyAnnotation.fromString(name,sourceName,accessionNumber)
         this.WhereProtocolTypeIsChildOf(source,obo,oa)
 
     /// Map all protocols in the collection to their description text
     [<CustomOperation("selectDescriptionText")>] 
-    member this.SelectDescriptionText (source: QuerySource<QSheet, 'Q>) : QuerySource<string, 'Q> =
+    member this.SelectDescriptionText (source: QuerySource<ArcTable, 'Q>) : QuerySource<string, 'Q> =
         addMessage $"select Description Text"
-        this.Select(source,(fun (v : QSheet) -> 
-            match v.Protocols.Head.Description with
-            | Option.Some d -> d
-            | None -> protocolHasNoDescription(v.Protocols.Head.Name.Value)
+        this.Select(source,(fun (v : ArcTable) -> 
+            v.GetProtocolDescriptionColumn().Cells.[0].AsFreeText
+            //match v.GetProtocolDescriptionColumn().Cells.[0].AsFreeText with
+            //| Option.Some d -> d
+            //| None -> protocolHasNoDescription(v.Protocols.Head.Name.Value)
         ))
 
     /// Return unevaluated expression 

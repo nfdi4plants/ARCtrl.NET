@@ -8,6 +8,7 @@ open System.IO
 open System.Collections.Generic
 open System.Collections
 
+
 [<AutoOpen>]
 module ProtocolExtensions = 
 
@@ -100,7 +101,7 @@ module ProtocolExtensions =
                 OntologyAnnotation.isChildTerm(parentProtocolType,pt)
             | _ -> false
 
-        member this.IsChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : Obo.OboOntology) =
+        member this.IsChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : OBO.NET.OboOntology) =
             match this.ProtocolType with
             | Some pt ->
                 OntologyAnnotation.isChildTerm(parentProtocolType,pt,obo)
@@ -144,11 +145,12 @@ module ArcTableExtensions =
 
         static member inputType (row : CRow)  =
             row.Cells
-            |> Seq.pick (fun (header,_) -> header.tryInput())
+            |> Seq.pick (fun (header,_) -> header.TryInput())
 
         static member outputType (row : CRow) =
             row.Cells
-            |> Seq.pick (fun (header,_) -> header.tryOutput())
+            |> Seq.pick (fun (header,_) -> header.TryOutput())
+            
 
         member this.InputName = CRow.inputName this
 
@@ -198,11 +200,11 @@ module ArcTableExtensions =
 
         static member inputType (t : ArcTable)  =
             t.Headers
-            |> Seq.pick (fun header -> header.tryInput())
+            |> Seq.pick (fun header -> header.TryInput())
 
         static member outputType (t : ArcTable) =
             t.Headers
-            |> Seq.pick (fun header -> header.tryOutput())
+            |> Seq.pick (fun header -> header.TryOutput())
 
         member this.InputType = ArcTable.inputType this
 

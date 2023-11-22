@@ -2,6 +2,8 @@
 
 open ARCtrl.ISA
 open Swate.Api
+open OBO.NET
+
 
 [<AutoOpen>]
 module OntologyAnnotation =
@@ -11,22 +13,22 @@ module OntologyAnnotation =
 
         /// Translates a SwateAPI `term` into an ISADotNet `OntologyAnnotation`
         static member ofTerm (term : Term) =
-            let ref,num = OntologyAnnotation.splitAnnotation term.Accession
             let description = Comment.fromString "Description" term.Definition
-            OntologyAnnotation.fromStringWithComments term.Name ref num [description]
+            OntologyAnnotation.fromString(term.Name,tan = term.Accession,comments = [|description|])
+            |> fun o -> {o with TermSourceREF = o.TANInfo |> Option.map (fun t -> t.IDSpace)}
 
         /// Translates an ISADotNet `OntologyAnnotation` into a SwateAPI `term`
         static member toTerm (term : OntologyAnnotation) =
-            TermMinimal.create term.NameText term.ShortAnnotationString
+            TermMinimal.create term.NameText term.TermAccessionShort
 
         /// Translates a OBO `term` into an ISADotNet `OntologyAnnotation`
-        static member ofOboTerm (term : Obo.OboTerm) =
-            let ref,num = OntologyAnnotation.splitAnnotation term.Id
-            OntologyAnnotation.fromString term.Name ref num
+        static member ofOboTerm (term : OboTerm) =
+            OntologyAnnotation.fromString(term.Name, tan = term.Id)
+            |> fun o -> {o with TermSourceREF = o.TANInfo |> Option.map (fun t -> t.IDSpace)}
 
         /// Translates an ISADotNet `OntologyAnnotation` into a OBO `term`
         static member toOboTerm (term : OntologyAnnotation) =
-            Obo.OboTerm.Create(term.ShortAnnotationString,term.NameText)
+            OboTerm.Create(term.TermAccessionShort,term.NameText)
 
         member this.ToOboTerm() =
             OntologyAnnotation.toOboTerm this
@@ -37,7 +39,7 @@ module OntologyAnnotation =
         static member findTerm(nameOrId : string) =
             Term.Search(nameOrId, 1).[0]
 
-        static member findTerm(nameOrId : string,ont : Obo.OboOntology) =
+        static member findTerm(nameOrId : string,ont : OboOntology) =
             match ont.TryGetOntologyAnnotation nameOrId with
             | Some oa ->
                 oa
@@ -46,7 +48,7 @@ module OntologyAnnotation =
                 | Some oa -> oa
                 | None -> failwithf "could not find Ontology term %s in given ontology" nameOrId
 
-        static member isChildTerm(parent : OntologyAnnotation,child : OntologyAnnotation,ont : Obo.OboOntology) =
+        static member isChildTerm(parent : OntologyAnnotation,child : OntologyAnnotation,ont : OboOntology) =
             ont.GetParentOntologyAnnotations(child)
             |> List.contains parent
 
@@ -58,28 +60,28 @@ module OntologyAnnotation =
             |> Array.isEmpty
             |> not       
 
-        member this.IsChildTermOf(parent : OntologyAnnotation, ont : Obo.OboOntology) =
+        member this.IsChildTermOf(parent : OntologyAnnotation, ont : OboOntology) =
             OntologyAnnotation.isChildTerm(parent,this,ont)
 
-        static member isEquivalentTo(term : OntologyAnnotation,targetTerm : OntologyAnnotation,ont : Obo.OboOntology) =
-            ont.GetEquivalentOntologyAnnotations(term)
+        static member isEquivalentTo(term : OntologyAnnotation,targetTerm : OntologyAnnotation,ont : OboOntology) =
+            ont.GetEquivalentOntologyAnnotations(term.TermAccessionShort)
             |> List.contains targetTerm
 
-        member this.IsEquivalentTo(targetTerm : OntologyAnnotation, ont : Obo.OboOntology) =
+        member this.IsEquivalentTo(targetTerm : OntologyAnnotation, ont : OboOntology) =
             OntologyAnnotation.isEquivalentTo(targetTerm,this,ont)
 
-        static member getAs (term : OntologyAnnotation, targetOntology : string, ont : Obo.OboOntology) =
+        static member getAs (term : OntologyAnnotation, targetOntology : string, ont : OboOntology) =
             ont.GetEquivalentOntologyAnnotations(term)
             |> List.find (fun t -> t.TermSourceREFString = targetOntology)
 
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             OntologyAnnotation.getAs(this,targetOntology,ont)
 
-        static member tryGetAs (term : OntologyAnnotation, targetOntology : string, ont : Obo.OboOntology) =
+        static member tryGetAs (term : OntologyAnnotation, targetOntology : string, ont : OboOntology) =
             ont.GetEquivalentOntologyAnnotations(term)
             |> List.tryFind (fun t -> t.TermSourceREFString = targetOntology)
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             OntologyAnnotation.tryGetAs(this,targetOntology,ont)
 
     type Protocol with
@@ -89,7 +91,7 @@ module OntologyAnnotation =
             |> Option.map (fun t -> t.IsChildTermOf(parent))
             |> Option.defaultValue false
 
-        static member isChildProtocolTypeOf(protocol : Protocol,parent : OntologyAnnotation, ont : Obo.OboOntology) =
+        static member isChildProtocolTypeOf(protocol : Protocol,parent : OntologyAnnotation, ont : OboOntology) =
             protocol.ProtocolType
             |> Option.map (fun t -> t.IsChildTermOf(parent,ont))
             |> Option.defaultValue false
@@ -97,17 +99,17 @@ module OntologyAnnotation =
         member this.IsChildProtocolTypeOf(parent : OntologyAnnotation) =
             Protocol.isChildProtocolTypeOf(this,parent)
 
-        member this.IsChildProtocolTypeOf(parent : OntologyAnnotation, ont : Obo.OboOntology) =
+        member this.IsChildProtocolTypeOf(parent : OntologyAnnotation, ont : OboOntology) =
             Protocol.isChildProtocolTypeOf(this,parent,ont)
 
     type Value with
     
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             match this with
             | Ontology oa -> Ontology (oa.GetAs(targetOntology, ont))
             | _ -> this
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             match this with
             | Ontology oa -> 
                 oa.TryGetAs(targetOntology, ont)
@@ -116,40 +118,40 @@ module OntologyAnnotation =
 
     type ProcessParameterValue with
     
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             {this with Value = this.Value |> Option.map (fun v -> v.GetAs(targetOntology,ont))}
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             this.Value
             |> Option.bind (fun v -> v.TryGetAs(targetOntology,ont))
             |> Option.map (fun v -> {this with Value = Some v})
 
     type MaterialAttributeValue with
     
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             {this with Value = this.Value |> Option.map (fun v -> v.GetAs(targetOntology,ont))}
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             this.Value
             |> Option.bind (fun v -> v.TryGetAs(targetOntology,ont))
             |> Option.map (fun v -> {this with Value = Some v})
 
     type FactorValue with
     
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             {this with Value = this.Value |> Option.map (fun v -> v.GetAs(targetOntology,ont))}
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             this.Value
             |> Option.bind (fun v -> v.TryGetAs(targetOntology,ont))
             |> Option.map (fun v -> {this with Value = Some v})
 
     type Component with
         
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.GetAs(targetOntology : string, ont : OboOntology) =
             {this with ComponentValue = this.ComponentValue |> Option.map (fun v -> v.GetAs(targetOntology,ont))}
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) =
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) =
             this.ComponentValue
             |> Option.bind (fun v -> v.TryGetAs(targetOntology,ont))
             |> Option.map (fun v -> {this with ComponentValue = Some v})

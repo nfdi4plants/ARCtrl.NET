@@ -4,6 +4,7 @@ open ARCtrl.ISA
 open OntologyAnnotation
 open System.Text.Json.Serialization
 open System.Collections.Generic
+open OBO.NET
 
 type ISAValue =
     | Parameter of ProcessParameterValue
@@ -193,7 +194,7 @@ module ISAValueExtensions =
             | Factor f          -> if this.HasValue && this.HasUnit then Some f.ValueWithUnitText else None
             | Component c       -> if this.HasValue && this.HasUnit then Some c.ValueWithUnitText else None
 
-        member this.HasParentCategory(parentOntology : OntologyAnnotation, ont : Obo.OboOntology) = 
+        member this.HasParentCategory(parentOntology : OntologyAnnotation, ont : OboOntology) = 
             match this.TryCategory with
             | Some oa -> oa.IsChildTermOf(parentOntology,ont)
             | None -> false
@@ -203,14 +204,14 @@ module ISAValueExtensions =
             | Some oa -> oa.IsChildTermOf(parentOntology)
             | None -> false
 
-        member this.GetAs(targetOntology : string, ont : Obo.OboOntology) = 
+        member this.GetAs(targetOntology : string, ont : OboOntology) = 
             match this with
             | Parameter p       -> p.GetAs(targetOntology,ont) |> Parameter
             | Characteristic c  -> c.GetAs(targetOntology,ont) |> Characteristic
             | Factor f          -> f.GetAs(targetOntology,ont) |> Factor
             | Component c       -> c.GetAs(targetOntology,ont) |> Component
 
-        member this.TryGetAs(targetOntology : string, ont : Obo.OboOntology) = 
+        member this.TryGetAs(targetOntology : string, ont : OboOntology) = 
             match this with
             | Parameter p       -> p.TryGetAs(targetOntology,ont) |> Option.map Parameter
             | Characteristic c  -> c.TryGetAs(targetOntology,ont) |> Option.map Characteristic
