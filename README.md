@@ -1,10 +1,10 @@
 ﻿# ARCtrl.NET
 
-> **ARCtrl.NET** is the .NET IO implementation of [ARCtrl](https://github.com/nfdi4plants/ARCtrl)
- 
-| Version | Downloads |
-| :--------|-----------:|
-|<a href="https://www.nuget.org/packages/ARCtrl.NET/"><img alt="Nuget" src="https://img.shields.io/nuget/vpre/ARCtrl.NET?logo=nuget&color=%234fb3d9"></a>|<a href="https://www.nuget.org/packages/ARCtrl/"><img alt="Nuget" src="https://img.shields.io/nuget/dt/ARCtrl?color=%234FB3D9"></a>|
+This library functions as an IO wrapper for the [ARCtrl](https://github.com/nfdi4plants/ARCtrl) library in .NET. 
+
+The documentation for the actual functions for manipulating the ARC datamodel can be found [here](https://github.com/nfdi4plants/ARCtrl/tree/main/docs/scripts_fsharp).
+
+## Usage
 
 ```fsharp
 #r "nuget: ARCtrl.NET, 1.0.0-beta.2"
@@ -12,11 +12,32 @@
 open ARCtrl.NET
 open ARCtrl
 
-let arc = ARC.load(myArcPath)
 
-// work work work
+let arcPath = ""
 
-arc.Write(myArcPath)
+let arc = ARC.load(arcPath)
+
+let isa = arc.ISA.Value
+
+isa.InitStudy("MyStudy")
+
+arc.Write(arcPath)
 ```
 
-For documentation on manipulationh of the datamodel, see https://github.com/nfdi4plants/ARCtrl/tree/main/docs
+## Development
+
+`./build.cmd runtests`
+
+## ARCtrl.Querymodel
+
+```fsharp
+open ARCtrl
+open ARCtrl.QueryModel
+open ARCtrl.ISA
+
+let i = ArcInvestigation("Dummy Investigation")
+
+i.ArcTables.Values().WithName("Dummy Header").First.ValueText
+
+i.GetAssay("Dummy Assay").LastSamples
+```
