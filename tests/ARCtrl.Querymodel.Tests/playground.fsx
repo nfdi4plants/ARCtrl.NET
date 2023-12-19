@@ -47,6 +47,14 @@ i.ArcTables.LastProcessedData
 
 i.ArcTables.Nodes
 |> List.map (fun x -> x.Name)
+|> List.length
+
+i.ArcTables.LastSamples
+|> List.map (fun x -> x.Name)
+
+i.ArcTables.LastNodes
+|> List.ofSeq
+|> List.map (fun x -> x.Name)
 
 let studies = i.StudyIdentifiers
 let heatAssays = i.Studies[0].RegisteredAssayIdentifiers |> List.ofSeq 
@@ -71,7 +79,8 @@ exampleLastSampleHeat.PreviousParameters
 //  i.GetAssay("MSEval_Heat") |> List.map (fun x -> x.Name) |> Array.ofSeq
 let allValuesOfExampleAssayAndExampleNode = 
     i.GetAssay("MSEval_Heat").ValuesOf("sampleOutHeat.txt")
-
+    // |> Seq.toList
+    // |> List.map (fun x -> x.NameText)
 allValuesOfExampleAssayAndExampleNode
 |> Seq.map (fun x -> x.NameText)
 |> List.ofSeq
@@ -81,11 +90,16 @@ exampleLastSampleHeat.Parameters
 |> List.map (fun x -> x.NameText)
 
 i.GetAssay("MS_Heat").ValuesOf("sampleOutHeat.txt")
+|> Seq.map (fun x -> x.NameText)
+|> List.ofSeq
+
+i.ArcTables.ValuesOf("sampleOutHeat.txt","MS")
+|> Seq.toList
+|> List.map (fun x -> x.NameText)
 
 i.GetAssay("MS_Heat").Values("MS")
 |> Seq.map (fun x -> x.NameText)
 |> List.ofSeq
-
 // let getBioRep (fN:QNode) = 
 //     match qi.ValuesOf(fN,ProtocolName = "Growth").WithName("biological replicate").Values.Head with
 //     | QueryModel.ISAValue.Parameter x -> x.Value.Value.AsString 
