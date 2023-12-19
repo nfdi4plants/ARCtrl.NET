@@ -80,8 +80,24 @@ exampleLastSampleHeat.Parameters
 |> Seq.toList
 |> List.map (fun x -> x.NameText)
 
+i.GetAssay("MS_Heat").ValuesOf("sampleOutHeat.txt")
+
+i.GetAssay("MS_Heat").Values("MS")
+|> Seq.map (fun x -> x.NameText)
+|> List.ofSeq
+
 // let getBioRep (fN:QNode) = 
 //     match qi.ValuesOf(fN,ProtocolName = "Growth").WithName("biological replicate").Values.Head with
 //     | QueryModel.ISAValue.Parameter x -> x.Value.Value.AsString 
 //     | _ -> failwith "no biorep please add"
 
+exampleLastSampleHeat.ParentProcessSequence.Nodes
+|> List.map (fun x -> x.Name)
+
+exampleLastSampleHeat.Nodes
+|> Seq.toList 
+|> List.map (fun x -> x.Name)
+
+// exampleLastSampleHeat.
+// |> Seq.toList 
+// |> List.map (fun x -> x.Name)
