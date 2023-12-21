@@ -1,5 +1,10 @@
-### 1.0.0+da0642b (Released 2023-11-2)
+### 1.0.0+e8e4ca3 (Released 2023-12-21)
 * Additions:
+    * [[#e8e4ca3](https://github.com/nfdi4plants/ARCtrl.NET/commit/e8e4ca37ea5dc963d36c33d5f92286f139fdd04e)] Update README.md with links and minimal documentation
+    * [[#d82fdf6](https://github.com/nfdi4plants/ARCtrl.NET/commit/d82fdf6f434902341e1da4dc26fc92da5c288fe6)] add querymodel test repo
+    * [[#32b0b7d](https://github.com/nfdi4plants/ARCtrl.NET/commit/32b0b7d96b7d25882309efe266498be32523a710)] finish up querymodel transition
+    * [[#49577a9](https://github.com/nfdi4plants/ARCtrl.NET/commit/49577a9cbba4bb171a092bdf731ad9477ffab47f)] continue transition of querymodel
+    * [[#d596f8b](https://github.com/nfdi4plants/ARCtrl.NET/commit/d596f8b5256200d1663273509fb8fee4537c2c1c)] bump to 1.0.0-beta.2
     * [[#da0642b](https://github.com/nfdi4plants/ARCtrl.NET/commit/da0642b71f8ca4a9e4344fbee0879fb0a61f5831)] add querymodel project from previous ISADotNet state
     * [[#ac8fb85](https://github.com/nfdi4plants/ARCtrl.NET/commit/ac8fb8506310f8e2bf8d9b8a5d15b34251149b0e)] bump to 1.0.0-beta.1
     * [[#70032b4](https://github.com/nfdi4plants/ARCtrl.NET/commit/70032b47f82a1177895d89ec314e44c357f95d0a)] add simple arc read-in test
