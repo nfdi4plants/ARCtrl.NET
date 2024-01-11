@@ -71,7 +71,7 @@ type ISAQueryBuilder () =
     member this.SelectText (source: QuerySource<OntologyAnnotation, 'Q>) : QuerySource<string, 'Q> =
         addMessage $"get text"
         this.Select(source,(fun (v : OntologyAnnotation) -> 
-            match v.TryNameText with
+            match v.Name with
             | Option.Some t -> t
             | Option.None -> missingOAText(v)
             )
