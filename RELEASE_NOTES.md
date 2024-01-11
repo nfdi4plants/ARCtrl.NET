@@ -1,3 +1,7 @@
+### 1.0.1+0c285e8 (Released 2024-1-11)
+* Additions:
+    * [[#0c285e8](https://github.com/nfdi4plants/ARCtrl.NET/commit/0c285e8dd9825fc4f747ef031d210a5109cded1c)] update arctrl reference to 1.0.2
+
 ### 1.0.0+e8e4ca3 (Released 2023-12-21)
 * Additions:
     * [[#e8e4ca3](https://github.com/nfdi4plants/ARCtrl.NET/commit/e8e4ca37ea5dc963d36c33d5f92286f139fdd04e)] Update README.md with links and minimal documentation
