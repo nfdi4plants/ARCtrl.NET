@@ -1,3 +1,8 @@
+### 1.0.3+9f43871 (Released 2024-1-26)
+* Additions:
+    * [[#9f43871](https://github.com/nfdi4plants/ARCtrl.NET/commit/9f438717591ebf61bbbbc36052b4ffffc8a2b21b)] update references
+    * [[#d201f25](https://github.com/nfdi4plants/ARCtrl.NET/commit/d201f2573a2b2ff8d05272dcf0dfca3b2815502e)] bump to 1.0.2
+
 ### 1.0.2+70b2b2c (Released 2024-1-24)
 * Additions:
     * [[#70b2b2c](https://github.com/nfdi4plants/ARCtrl.NET/commit/70b2b2ceb3b09615ad74afbd9d3e8c9abfcf09e5)] update arctrl and fsspreadsheet refs
