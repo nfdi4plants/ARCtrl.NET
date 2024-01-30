@@ -1,3 +1,7 @@
+### 1.0.4+9e24cf4 (Released 2024-1-30)
+* Additions:
+    * Update dependencies
+
 ### 1.0.3+9f43871 (Released 2024-1-26)
 * Additions:
     * [[#9f43871](https://github.com/nfdi4plants/ARCtrl.NET/commit/9f438717591ebf61bbbbc36052b4ffffc8a2b21b)] update references
