@@ -140,6 +140,8 @@ module ArcTables =
                     QNode(oname,ot,ps)
                     |> Some
                 )
+            |> ResizeArray.distinctBy (fun n -> n.Name)
+
 
         /// Returns the names of all nodes for which the predicate reutrns true
         static member getNodesBy (predicate : IOType -> bool) (ps : #ArcTables) =

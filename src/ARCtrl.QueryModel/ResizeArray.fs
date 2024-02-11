@@ -64,3 +64,13 @@ module ResizeArray =
             if not (b.Contains(i)) then
                 b.Add(i)
         b
+
+    let distinctBy f (a : ResizeArray<_>) =
+        let b = ResizeArray<_>()
+        let c = ResizeArray<_>()
+        for i in a do
+            let k = f i
+            if not (c.Contains(k)) then
+                c.Add(k)
+                b.Add(i)
+        b

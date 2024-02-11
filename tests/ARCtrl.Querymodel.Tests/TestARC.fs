@@ -10,9 +10,9 @@ let testArcPath = __SOURCE_DIRECTORY__ + @"\TestObjects\TestArc"
 let testArc = ARC.load(testArcPath)
 
 
-let getNodes =
+let ArcTables_getNodes =
     let isa = testArc.ISA.Value
-    testList "GetNodes" [
+    testList "ARCTables_GetNodes" [
         testCase "LastData" (fun () -> 
             let nodes = isa.ArcTables.LastData
             let nodeNames = nodes |> List.map (fun n -> n.Name)
@@ -33,9 +33,41 @@ let getNodes =
         )
     ]
 
+let Assay_getNodes =
+    let isa = testArc.ISA.Value
+    testList "Assay_GetNodes" [
+        
+        testCase "LastNodes" (fun () ->
+            let nodes = isa.GetAssay("MSEval_Heat").LastNodes
+            let nodeNames = nodes |> Seq.map (fun n -> n.Name)
+            let expected = ["sampleOutHeat.txt"]
+            Expect.sequenceEqual nodeNames expected "LastData of full sequence"    
+        )
+    ]
+
+
+let ArcTables_ValueOf =
+    let isa = testArc.ISA.Value
+    testList "ArcTable_ValueOf" [
+        testCase "Values" (fun () ->
+            let nodeName = "sampleOutHeat.txt"
+            let protocolName =  "MS"
+
+            let values = 
+                isa.ArcTables.ValuesOf(nodeName,protocolName)
+                |> Seq.toList
+                |> List.map (fun x -> x.NameText)
+            Expect.isTrue false ""
+        )
+    ]
+
+
+
 
 
 [<Tests>]
 let main = testList "TestArcTests" [
-    getNodes
+    ArcTables_getNodes
+    Assay_getNodes
+    ArcTables_ValueOf
 ]
