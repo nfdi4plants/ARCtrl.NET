@@ -48,16 +48,44 @@ let Assay_getNodes =
 
 let ArcTables_ValueOf =
     let isa = testArc.ISA.Value
-    testList "ArcTable_ValueOf" [
-        testCase "Values" (fun () ->
+    testList "ArcTable_Values" [
+        testCase "ValuesOf_SpecificTable" (fun () ->
             let nodeName = "sampleOutHeat.txt"
-            let protocolName =  "MS"
+            let protocolName =  "MS"            
+            let values = isa.ArcTables.ValuesOf(nodeName,protocolName)
+            let expected = 
+                [
+                    ISAValue.Parameter (
+                        ProcessParameterValue.create(
+                            ProtocolParameter.fromString("technical replicate","MS","MS:1001808"), 
+                            Value.Ontology (OntologyAnnotation.fromString("1"))
+                        )
+                    )
+                    ISAValue.Parameter (
+                        ProcessParameterValue.create(
+                            ProtocolParameter.fromString("injection volume setting","AFR","AFR:0001577"), 
+                            Value.Int 20,
+                            OntologyAnnotation.fromString("microliter","UO","http://purl.obolibrary.org/obo/UO_0000101")
+                        )
+                    )
+                ]
+            Expect.sequenceEqual values expected "Did not return correct values for specific table"
+        )
+        testCase "ValuesOf" (fun () ->
+            let nodeName = "sampleOutHeat.txt"
 
-            let values = 
-                isa.ArcTables.ValuesOf(nodeName,protocolName)
-                |> Seq.toList
-                |> List.map (fun x -> x.NameText)
-            Expect.isTrue false ""
+            let valueHeaders = 
+                isa.ArcTables.ValuesOf(nodeName)
+                |> Seq.map (fun x -> x.NameText)
+            let expected = 
+                ["biological replicate";"organism";"temperature day";"pH";"technical replicate"; "injection volume setting";"analysis software"]
+            Expect.sequenceEqual valueHeaders expected "Did not return correct values for all table"
+        )
+        testCase "GetSpecificValue" (fun () ->
+            let rep1 = isa.ArcTables.ValuesOf("C1_measured").WithName("biological replicate").First.ValueText
+            Expect.equal rep1 "1" "Did not return correct value for specific table"
+            let rep2 = isa.ArcTables.ValuesOf("C2_measured").WithName("biological replicate").First.ValueText
+            Expect.equal rep2 "2" "Did not return correct value for specific table"
         )
     ]
 
