@@ -1,5 +1,7 @@
 #r "nuget: ARCtrl"
 #r @"bin\Release\net6.0\ARCtrl.NET.dll"
+#r @"bin\Release\net6.0\FSSpreadsheet.dll"
+#r @"bin\Release\net6.0\ARCtrl.Contract.dll"
 #r @"bin\Release\net6.0\ARCtrl.Querymodel.dll"
 #r @"bin\Release\net6.0\Fable.Core.dll"
 #r @"bin\Release\net6.0\OBO.NET.dll"
