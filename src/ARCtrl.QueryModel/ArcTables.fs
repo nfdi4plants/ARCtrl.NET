@@ -232,10 +232,9 @@ module ArcTables =
                 ps.Tables 
                 |> ResizeArray.collect (fun p -> 
                     p.Rows 
-                    |> List.map (fun r -> r.Output,r)
-                    |> List.distinct
+                    |> List.groupBy (fun r -> r.Output)
+                    //|> List.map (fun (o,rs) -> o, rs |> List.map snd)
                 ) 
-
                 |> Map.ofSeq
             let rec loop values lastState state = 
                 if lastState = state then values 
@@ -244,11 +243,16 @@ module ArcTables =
                         state 
                         |> List.map (fun s -> 
                             mappings.TryFind s 
-                            |> Option.map (fun r -> r.Input,r.Values |> Seq.toList)
-                            |> Option.defaultValue (s,[])
+                            |> Option.map (fun rs -> 
+                                rs 
+                                |> List.map (fun r -> r.Input,r.Values |> Seq.toList)
+                                |> List.unzip
+                                |> fun (s,vs) -> s, vs |> List.concat
+                            )                            
+                            |> Option.defaultValue ([],[])
                         )
                         |> List.unzip
-                        |> fun (s,vs) -> s, vs |> List.concat
+                        |> fun (s,vs) -> s |> List.concat, vs |> List.concat
                     loop (newValues@values) state newState
             loop [] [] [node]  
             |> ValueCollection
@@ -259,8 +263,7 @@ module ArcTables =
                 ps.Tables 
                 |> ResizeArray.collect (fun p -> 
                     p.Rows 
-                    |> List.map (fun r -> r.Input,r)
-                    |> List.distinct
+                    |> List.groupBy (fun r -> r.Input)
                 ) 
 
                 |> Map.ofSeq
@@ -271,11 +274,16 @@ module ArcTables =
                         state 
                         |> List.map (fun s -> 
                             mappings.TryFind s 
-                            |> Option.map (fun r -> r.Output,r.Values |> Seq.toList)
-                            |> Option.defaultValue (s,[])
+                            |> Option.map (fun rs -> 
+                                rs 
+                                |> List.map (fun r -> r.Output,r.Values |> Seq.toList)
+                                |> List.unzip
+                                |> fun (s,vs) -> s, vs |> List.concat
+                            )                            
+                            |> Option.defaultValue ([],[])
                         )
                         |> List.unzip
-                        |> fun (s,vs) -> s, vs |> List.concat
+                        |> fun (s,vs) -> s |> List.concat, vs |> List.concat
                     loop (values@newValues) state newState
             loop [] [] [sample]
             |> ValueCollection

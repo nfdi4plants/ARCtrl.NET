@@ -31,6 +31,24 @@ let ArcTables_getNodes =
             let expected = ["sampleOutCold.txt"; "sampleOutHeat.txt"]
             Expect.sequenceEqual nodeNames expected "LastData of full sequence"    
         )
+        testCase "RawData" (fun () ->
+            let nodes = isa.ArcTables.RawData
+            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        )
+        testCase "LastRawData" (fun () ->
+            let nodes = isa.ArcTables.LastRawData
+            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        )
+        testCase "FirstRawData" (fun () ->
+            let nodes = isa.ArcTables.FirstRawData
+            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        )
     ]
 
 let Assay_getNodes =
@@ -44,7 +62,36 @@ let Assay_getNodes =
             Expect.sequenceEqual nodeNames expected "LastData of full sequence"    
         )
     ]
+let Assay_ValuesOf =
+    let isa = testArc.ISA.Value
+    testList "Assay_ValuesOf" [
+        
+        testCase "ValuesOfOutput_PooledOutput" (fun () ->
+            let values = isa.GetAssay("MSEval_Heat").ValuesOf("sampleOutHeat.txt").WithName("Column")
+            let valueValues = values |> Seq.map (fun n -> n.ValueText)
+            let expected = ["C1 Intensity";"C2 Intensity";"C3 Intensity";"H1 Intensity";"H2 Intensity";"H3 Intensity"]
+            Expect.sequenceEqual valueValues expected "Did not return all values correctly"    
+        )
+        testCase "SucceedingValuesOfInput_PooledOutput" (fun () ->
+            let values = isa.GetAssay("MSEval_Heat").SucceedingValuesOf("C2_measured").WithName("Column")
+            let valueValues = values |> Seq.map (fun n -> n.ValueText)
+            let expected = ["C2 Intensity"]
+            Expect.sequenceEqual valueValues expected "Did not return the single value correctly"    
+        )
+        testCase "PreviousValuesOfInput_PooledOutput" (fun () ->
+            let values = isa.GetAssay("MSEval_Heat").PreviousValuesOf("C2_measured").WithName("Column")
+            let valueValues = values |> Seq.map (fun n -> n.ValueText)
+            let expected = []
+            Expect.sequenceEqual valueValues expected "Should return no values"    
+        )
+        testCase "ValuesOfInput_PooledOutput" (fun () ->
+            let values = isa.GetAssay("MSEval_Heat").ValuesOf("C2_measured").WithName("Column")
+            let valueValues = values |> Seq.map (fun n -> n.ValueText)
+            let expected = ["C2 Intensity"]
+            Expect.sequenceEqual valueValues expected "Did not return the single value correctly"    
+        )
 
+    ]
 
 let ArcTables_ValueOf =
     let isa = testArc.ISA.Value
@@ -75,10 +122,10 @@ let ArcTables_ValueOf =
             let nodeName = "sampleOutHeat.txt"
 
             let valueHeaders = 
-                isa.ArcTables.ValuesOf(nodeName)
+                isa.ArcTables.ValuesOf(nodeName).DistinctHeaderCategories()
                 |> Seq.map (fun x -> x.NameText)
             let expected = 
-                ["biological replicate";"organism";"temperature day";"pH";"technical replicate"; "injection volume setting";"analysis software"]
+                ["biological replicate";"organism";"temperature day";"pH";"technical replicate"; "injection volume setting";"analysis software";"Column"]
             Expect.sequenceEqual valueHeaders expected "Did not return correct values for all table"
         )
         testCase "GetSpecificValue" (fun () ->
@@ -97,5 +144,6 @@ let ArcTables_ValueOf =
 let main = testList "TestArcTests" [
     ArcTables_getNodes
     Assay_getNodes
+    Assay_ValuesOf
     ArcTables_ValueOf
 ]
