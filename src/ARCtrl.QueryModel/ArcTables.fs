@@ -142,7 +142,6 @@ module ArcTables =
                 )
             |> ResizeArray.distinctBy (fun n -> n.Name)
 
-
         /// Returns the names of all nodes for which the predicate reutrns true
         static member getNodesBy (predicate : IOType -> bool) (ps : #ArcTables) =
             ps.Tables 
@@ -210,6 +209,40 @@ module ArcTables =
                     loop nextSearchEntities targs
 
             loop (ArcTables.getFinalOutputs ps |> List.ofSeq) []
+
+        static member getPreviousNodesBy (node : string) (ps : #ArcTables) =
+
+            let rec collectBackwardNodes nodes =
+                let newNodes = 
+                    ps.Tables
+                    |> Seq.collect (fun sheet ->
+                        sheet.Rows 
+                        |> Seq.choose (fun r -> if List.contains r.Output nodes then Some r.Input else None)
+                    )
+                    |> Seq.toList
+                    |> List.append nodes 
+                    |> List.distinct
+                       
+                if newNodes = nodes then nodes
+                else collectBackwardNodes newNodes
+
+            collectBackwardNodes [node]
+
+        static member getSucceedingNodesBy (node : string) (ps : #ArcTables) =
+            let rec collectForwardNodes nodes =
+                let newNodes = 
+                    ps.Tables
+                    |> Seq.collect (fun sheet ->
+                        sheet.Rows 
+                        |> Seq.choose (fun r -> if List.contains r.InputName nodes then Some r.OutputName else None)
+                    )
+                    |> Seq.toList
+                    |> List.append nodes 
+                    |> List.distinct
+                
+                if newNodes = nodes then nodes
+                else collectForwardNodes newNodes
+            collectForwardNodes [node]
 
         /// Returns the names of all nodes processSequence, which are connected to the given node and for which the predicate returns true
         static member getNodesOfBy (predicate : IOType -> bool) (node : string) (ps : #ArcTables) =
@@ -487,47 +520,32 @@ module ArcTables =
             let ps = if ProtocolName.IsSome then ArcTables.onlyValuesOfProtocol this ProtocolName.Value else this
             ps.Values().Components()
 
-        /// Returns all values in the process sequence, that are connected to the given node
-        ///
-        /// If a protocol name is given, returns only the values of the processes that implement this protocol
-        member this.ValuesOf(node : string, ?ProtocolName : string) =
-            match ProtocolName with
-            | Some ps ->
-                let connectedNodes = this.NodesOf node
-                let ps = ArcTables.onlyValuesOfProtocol this ps
-                connectedNodes
-                |> ResizeArray.collect (fun n -> 
-                    ps.ValuesOf(n)
-                ) 
-                |> ResizeArray.distinct
-                |> ValueCollection
-            | None ->           
-                (ArcTables.getPreviousValuesOf this node).Values @ (ArcTables.getSucceedingValuesOf this node).Values
-                |> ValueCollection
 
-        /// Returns all values in the process sequence, that are connected to the given node
-        ///
-        /// If a protocol name is given, returns only the values of the processes that implement this protocol
-        member this.ValuesOf(node : QNode, ?ProtocolName : string) =
-            this.ValuesOf(node.Name, ?ProtocolName = ProtocolName)
-
-        /// Returns all values in the process sequence, that are connected to the given node and come before it in the sequence
-        ///
-        /// If a protocol name is given, returns only the values of the processes that implement this protocol
         member this.PreviousValuesOf(node : string, ?ProtocolName) =
             match ProtocolName with
             | Some ps ->
-                let connectedNodes = this.NodesOf node
+                let previousNodes = ArcTables.getPreviousNodesBy node this
                 let ps = ArcTables.onlyValuesOfProtocol this ps
-                connectedNodes
-                |> ResizeArray.collect (fun n -> 
+                previousNodes
+                |> Seq.collect (fun n -> 
                     ps.PreviousValuesOf(n)
-                ) 
-                |> ResizeArray.distinct
+                )                 
                 |> ValueCollection
-            | None ->           
+            | None ->
                 ArcTables.getPreviousValuesOf this node
 
+        member this.SucceedingValuesOf(node : string, ?ProtocolName) =
+            match ProtocolName with
+            | Some ps ->
+                let succeedingNodes = ArcTables.getSucceedingNodesBy node this
+                let ps = ArcTables.onlyValuesOfProtocol this ps
+                succeedingNodes
+                |> Seq.collect (fun n -> 
+                    ps.SucceedingValuesOf(n)
+                ) 
+                |> ValueCollection
+            | None ->
+                ArcTables.getSucceedingValuesOf this node
 
         /// Returns all values in the process sequence, that are connected to the given node and come before it in the sequence
         ///
@@ -538,25 +556,21 @@ module ArcTables =
         /// Returns all values in the process sequence, that are connected to the given node and come after it in the sequence
         ///
         /// If a protocol name is given, returns only the values of the processes that implement this protocol
-        member this.SucceedingValuesOf(node : string, ?ProtocolName) =
-            match ProtocolName with
-            | Some ps ->
-                let connectedNodes = this.NodesOf node
-                let ps = ArcTables.onlyValuesOfProtocol this ps
-                connectedNodes
-                |> ResizeArray.collect (fun n -> 
-                    ps.SucceedingValuesOf(n)
-                ) 
-                |> ResizeArray.distinct
-                |> ValueCollection
-            | None ->           
-                ArcTables.getSucceedingValuesOf this node
-
-        /// Returns all values in the process sequence, that are connected to the given node and come after it in the sequence
-        ///
-        /// If a protocol name is given, returns only the values of the processes that implement this protocol
         member this.SucceedingValuesOf(node : QNode, ?ProtocolName) =
             this.SucceedingValuesOf(node.Name, ?ProtocolName = ProtocolName)
+
+        /// Returns all values in the process sequence, that are connected to the given node
+        ///
+        /// If a protocol name is given, returns only the values of the processes that implement this protocol
+        member this.ValuesOf(node : string, ?ProtocolName : string) =
+            this.PreviousValuesOf(node,?ProtocolName = ProtocolName).Values @ this.SucceedingValuesOf(node,?ProtocolName = ProtocolName).Values
+            |> ValueCollection
+
+        /// Returns all values in the process sequence, that are connected to the given node
+        ///
+        /// If a protocol name is given, returns only the values of the processes that implement this protocol
+        member this.ValuesOf(node : QNode, ?ProtocolName : string) =
+            this.ValuesOf(node.Name, ?ProtocolName = ProtocolName)
 
         /// Returns all characteristic values in the process sequence, that are connected to the given node
         ///

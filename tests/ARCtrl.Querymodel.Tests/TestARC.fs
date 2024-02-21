@@ -100,21 +100,29 @@ let ArcTables_ValueOf =
             let nodeName = "sampleOutHeat.txt"
             let protocolName =  "MS"            
             let values = isa.ArcTables.ValuesOf(nodeName,protocolName)
-            let expected = 
-                [
-                    ISAValue.Parameter (
+            let expectedTechRep =
+                ISAValue.Parameter (
                         ProcessParameterValue.create(
                             ProtocolParameter.fromString("technical replicate","MS","MS:1001808"), 
                             Value.Ontology (OntologyAnnotation.fromString("1"))
                         )
                     )
-                    ISAValue.Parameter (
+            let expectedInjVol =
+                ISAValue.Parameter (
                         ProcessParameterValue.create(
                             ProtocolParameter.fromString("injection volume setting","AFR","AFR:0001577"), 
                             Value.Int 20,
                             OntologyAnnotation.fromString("microliter","UO","http://purl.obolibrary.org/obo/UO_0000101")
                         )
                     )
+            let expected = 
+                [
+                    expectedTechRep;expectedInjVol
+                    expectedTechRep;expectedInjVol
+                    expectedTechRep;expectedInjVol
+                    expectedTechRep;expectedInjVol
+                    expectedTechRep;expectedInjVol
+                    expectedTechRep;expectedInjVol
                 ]
             Expect.sequenceEqual values expected "Did not return correct values for specific table"
         )
@@ -133,6 +141,14 @@ let ArcTables_ValueOf =
             Expect.equal rep1 "1" "Did not return correct value for specific table"
             let rep2 = isa.ArcTables.ValuesOf("C2_measured").WithName("biological replicate").First.ValueText
             Expect.equal rep2 "2" "Did not return correct value for specific table"
+        )
+        testCase "ValuesOf_SpecificTable_PooledOutput" (fun () ->
+            let vals = isa.ArcTables.ValuesOf("sampleOutHeat.txt","Growth").WithName("biological replicate").Values |> List.map (fun v -> v.ValueText)         
+            Expect.sequenceEqual vals ["1";"2";"3";"1";"2";"3"] "Did not return correct values"
+        )
+        testCase "SpecificValue_SpecificTable_PooledOutput" (fun () ->
+            let vals = isa.ArcTables.ValuesOf("C2_prep","Growth").WithName("biological replicate").First.ValueText
+            Expect.equal vals "2" "Did not return correct value"
         )
     ]
 
