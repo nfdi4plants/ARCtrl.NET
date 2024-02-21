@@ -11,60 +11,18 @@ open System.Collections
 [<AutoOpen>]
 module ArcInvestigationExtensions = 
 
-    ///// Queryable representation of an ISA Investigation. Implements the QProcessSequence interface
-    //type ArcInvestigation with
+    /// Queryable representation of an ISA Investigation. Implements the QProcessSequence interface
+    type ArcInvestigation with
 
-    //    /// Returns the QStudy with the given name
-    //    member this.Study(studyName : string) = 
-    //        this.Studies
-    //        |> List.find (fun s -> s.Identifier.Value = studyName)
-        
-    //    /// Returns the nth QStudy
-    //    member this.Study(i : int) = 
-    //        this.Studies
-    //        |> List.item i 
-
-    //    /// Returns the QAssay with the given name (registered in the study with the given study name)
-    //    member this.Assay(assayName : string, ?StudyName : string) = 
-    //        match StudyName with
-    //        | Some sn ->
-    //            this.Study(sn).Assay(assayName)
-    //        | None ->
-    //            this.Studies
-    //            |> List.collect (fun s -> s.Assays)
-    //            |> List.find (fun a -> a.FileName.Value.Contains assayName)
-
-    //    /// get the protocol or sheet (in ISATab logic) with the given name
-    //    member this.Protocol (sheetName : string) =
-    //        base.Protocol(sheetName, $"Assay \"{this.FileName}\"")
-
-    //    /// get the nth protocol or sheet (in ISATab logic) 
-    //    member this.Protocol (index : int) =
-    //        base.Protocol(index, $"Assay \"{this.FileName}\"")
-
-    //    /// Returns the initial inputs final outputs of the assay, to which no processPoints
-    //    static member getRootInputs (investigation : QInvestigation) = QProcessSequence.getRootInputs investigation
-
-    //    /// Returns the final outputs of the investigation, which point to no further nodes
-    //    static member getFinalOutputs (investigation : QInvestigation) = QProcessSequence.getFinalOutputs investigation
-
-    //    /// Returns the initial inputs final outputs of the investigation, to which no processPoints
-    //    static member getRootInputOf (investigation : QInvestigation) (sample : string) = QProcessSequence.getRootInputsOfBy (fun _ -> true) sample investigation 
-        
-    //    /// Returns the final outputs of the investigation, which point to no further nodes
-    //    static member getFinalOutputsOf (investigation : QInvestigation) (sample : string) = QProcessSequence.getFinalOutputsOfBy (fun _ -> true) sample investigation
-
-    //    static member toString (rwa : QInvestigation) =  JsonSerializer.Serialize<QInvestigation>(rwa,JsonExtensions.options)
-
-    //    static member toFile (path : string) (rwa:QInvestigation) = 
-    //        File.WriteAllText(path,QInvestigation.toString rwa)
-
-    //    static member fromString (s:string) = 
-    //        JsonSerializer.Deserialize<QInvestigation>(s,JsonExtensions.options)
-
-    //    static member fromFile (path : string) = 
-    //        File.ReadAllText path 
-    //        |> QInvestigation.fromString
+        /// Returns the QStudy with the given name
+        member this.ArcTables
+            with get() : ArcTables = 
+                seq {
+                    for s in this.Studies do yield! s.Tables
+                    for a in this.Assays do yield! a.Tables
+                }
+                |> ResizeArray
+                |> ArcTables
 
     module Investigation =
 

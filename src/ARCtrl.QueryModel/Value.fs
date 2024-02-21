@@ -172,11 +172,11 @@ module ISAValueExtensions =
             this.TryUnit |> Option.map (fun u -> u.NameText)
 
         /// Returns the value of the Value as string
-        member this.ValueText = this.Value.AsName()
+        member this.ValueText = this.Value.Text
 
         /// Returns the value of the Value as string if it exists, else returns None
         member this.TryValueText = 
-            this.TryValue |> Option.map (fun v -> v.AsName())
+            this.TryValue |> Option.map (fun v -> v.Text)
 
         /// Returns the value and unit of the Value as string
         member this.ValueWithUnitText =

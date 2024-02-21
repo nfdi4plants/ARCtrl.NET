@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 
 **/TestResults/**
+tests/ARCtrl.Querymodel.Tests/playground_2.fsx

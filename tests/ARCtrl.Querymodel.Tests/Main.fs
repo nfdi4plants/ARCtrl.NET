@@ -4,7 +4,7 @@ open Expecto
 
 
 let all = testSequenced <| testList "All" [
-        ArcTable.Tests.testStuff     
+        TestARC.Tests.main     
     ]
 
 [<EntryPoint>]
