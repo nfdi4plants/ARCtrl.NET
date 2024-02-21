@@ -1,3 +1,22 @@
+### 1.0.5+2195d8a (Released 2024-2-21)
+* Additions:
+    * [[#2c40682](https://github.com/nfdi4plants/ARCtrl.NET/commit/2c406826a109f14b033f12467c6248d963878820)] add querymodel helper function and minimal README
+    * [[#26a3ed4](https://github.com/nfdi4plants/ARCtrl.NET/commit/26a3ed4cf0049c4c675c755256bdf8642aa72d69)] Create TestArc
+    * [[#f0d8b49](https://github.com/nfdi4plants/ARCtrl.NET/commit/f0d8b49b2d7a13325efcf07b9cd94470b97d65ce)] add playground.fsx
+    * [[#bce18c1](https://github.com/nfdi4plants/ARCtrl.NET/commit/bce18c198290b02b07213ecb7baebec2e65c4742)] Update playground.fsx
+    * [[#eefaeea](https://github.com/nfdi4plants/ARCtrl.NET/commit/eefaeeab68e4a719bcc2f2d492227fe927b27c38)] Update playground.fsx
+    * [[#ac9eb94](https://github.com/nfdi4plants/ARCtrl.NET/commit/ac9eb94922ec4350bac945e61c125c57c73b9afa)] update querymodel test objects
+    * [[#67fe811](https://github.com/nfdi4plants/ARCtrl.NET/commit/67fe811e8e452a9cb0bf55928ed3197764c8f6af)] add minimal querymodel tests
+    * [[#dff6154](https://github.com/nfdi4plants/ARCtrl.NET/commit/dff61542bb7176b774fec7b4ca04c0c440234121)] reduce complexity of querymodel testfiles
+    * [[#d8d5c39](https://github.com/nfdi4plants/ARCtrl.NET/commit/d8d5c39aade197d70b0ea089f330cfe980cf7169)] improve quality of querymodel testarc
+    * [[#468d3bb](https://github.com/nfdi4plants/ARCtrl.NET/commit/468d3bb67dc364a5b6251cbafb9883d6beb70bb6)] update test arc
+* Bugfixes:
+    * [[#e020abe](https://github.com/nfdi4plants/ARCtrl.NET/commit/e020abe86dbfd9c22cd94f7959cd3e8e80146b4e)] fix typos in sample arc, update playground.fsx
+    * [[#f490ce6](https://github.com/nfdi4plants/ARCtrl.NET/commit/f490ce6a0211f03e28cc283182c967d076425e56)] fix querymodel getNodesBy returning duplicate nodes
+    * [[#e28a464](https://github.com/nfdi4plants/ARCtrl.NET/commit/e28a4643495b151e839340ad17bc74c8ef6c6a5d)] test and fix querymodel value retrieval
+    * [[#e4a7c14](https://github.com/nfdi4plants/ARCtrl.NET/commit/e4a7c14d1b4b1d51f17db811b4224ee145b567c9)] added querymodel test and fix for values of pooled output #18
+    * [[#b40490c](https://github.com/nfdi4plants/ARCtrl.NET/commit/b40490cf94e600ed172accfa597d726438d8093b)] fix querymodel value getting
+
 ### 1.0.4+9e24cf4 (Released 2024-1-30)
 * Additions:
     * Update dependencies
