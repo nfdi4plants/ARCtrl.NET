@@ -1,3 +1,7 @@
+### 1.1.0+59d90c6 (Released 2024-4-3)
+* Additions:
+    * [[#59d90c6](https://github.com/nfdi4plants/ARCtrl.NET/commit/59d90c67c24606366dc4e0cd3e21e0689ce515a0)] add first version of update function
+
 ### 1.0.5+2195d8a (Released 2024-2-21)
 * Additions:
     * [[#2c40682](https://github.com/nfdi4plants/ARCtrl.NET/commit/2c406826a109f14b033f12467c6248d963878820)] add querymodel helper function and minimal README
