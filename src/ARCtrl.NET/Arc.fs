@@ -12,6 +12,10 @@ module ARCExtensions =
             this.GetWriteContracts()
             |> Array.iter (Contract.fulfillWriteContract arcPath)
 
+        member this.Update(arcPath) =
+            this.GetUpdateContracts()
+            |> Array.iter (Contract.fulfillUpdateContract arcPath)
+
         static member load (arcPath : string) =
             let paths = Path.getAllFilePaths arcPath
             let arc = ARC.fromFilePaths paths

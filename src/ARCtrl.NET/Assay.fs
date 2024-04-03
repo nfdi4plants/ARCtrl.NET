@@ -4,7 +4,7 @@ open ARCtrl
 open ARCtrl.ISA
 open ARCtrl.ISA.Spreadsheet
 open FsSpreadsheet
-open FsSpreadsheet.ExcelIO
+open FsSpreadsheet.Net
 open System.IO 
 
 module Assay = 
