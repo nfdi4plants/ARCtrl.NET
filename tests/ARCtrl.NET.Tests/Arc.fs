@@ -4,7 +4,6 @@ open Expecto
 open ARCtrl.NET
 open System.IO
 open ARCtrl
-open ARCtrl.ISA
 
 let testInputFolder = System.IO.Path.Combine(__SOURCE_DIRECTORY__,@"TestObjects")
 let testOutputFolder = System.IO.Path.Combine(__SOURCE_DIRECTORY__,@"TestResults")

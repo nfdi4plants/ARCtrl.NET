@@ -2,7 +2,7 @@
 
 open ARCtrl.Contract
 open FsSpreadsheet
-open FsSpreadsheet.ExcelIO
+open FsSpreadsheet.Net
 
 let fulfillReadContract basePath (c : Contract) =
     let log = Logging.createLogger("ReadContractHandler")
@@ -27,7 +27,7 @@ let fulfillWriteContract basePath (c : Contract) =
     | Some (DTO.Spreadsheet wb) ->
         let path = System.IO.Path.Combine(basePath, c.Path)
         Path.ensureDirectory path
-        FsWorkbook.toFile path (wb :?> FsWorkbook)
+        FsWorkbook.toXlsxFile path (wb :?> FsWorkbook)
     | Some (DTO.Text t) ->
         let path = System.IO.Path.Combine(basePath, c.Path)
         Path.ensureDirectory path
