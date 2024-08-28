@@ -16,7 +16,7 @@ module Assay =
         /// Checks if an assay folder exists in the ARC.
         let exists (arc : string) (identifier : string) =
             
-            Path.Combine([|arc;ARCtrl.Path.AssaysFolderName;identifier|])
+            Path.Combine([|arc;ARCtrl.ArcPathHelper.AssaysFolderName;identifier|])
             |> System.IO.Directory.Exists
 
 
