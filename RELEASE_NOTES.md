@@ -1,3 +1,7 @@
+### 2.0.0+075458b (Released 2024-4-22)
+* Additions:
+    * [[#075458b](https://github.com/nfdi4plants/ARCtrl.NET/commit/075458b84a50b745ce1dc572a1d35897e1b90d6b)] update dependencies of ARCtrl.NET
+
 ### 1.0.5+2195d8a (Released 2024-2-21)
 * Additions:
     * [[#2c40682](https://github.com/nfdi4plants/ARCtrl.NET/commit/2c406826a109f14b033f12467c6248d963878820)] add querymodel helper function and minimal README

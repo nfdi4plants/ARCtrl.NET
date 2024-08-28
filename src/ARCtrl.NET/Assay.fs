@@ -1,10 +1,10 @@
 ﻿namespace ARCtrl.NET
 
 open ARCtrl
-open ARCtrl.ISA
-open ARCtrl.ISA.Spreadsheet
+open ARCtrl
+open ARCtrl.Spreadsheet
 open FsSpreadsheet
-open FsSpreadsheet.ExcelIO
+open FsSpreadsheet.Net
 open System.IO 
 
 module Assay = 
@@ -16,7 +16,7 @@ module Assay =
         /// Checks if an assay folder exists in the ARC.
         let exists (arc : string) (identifier : string) =
             
-            Path.Combine([|arc;ARCtrl.Path.AssaysFolderName;identifier|])
+            Path.Combine([|arc;ARCtrl.ArcPathHelper.AssaysFolderName;identifier|])
             |> System.IO.Directory.Exists
 
 
@@ -27,7 +27,7 @@ module Assay =
 
 
     let readByIdentifier (arc : string) (identifier : string) =
-        ISA.Identifier.Assay.fileNameFromIdentifier identifier
+        Helper.Identifier.Assay.fileNameFromIdentifier identifier
         |> readByFileName arc
 
     //let tryReadFromFolder (folderPath : string) =

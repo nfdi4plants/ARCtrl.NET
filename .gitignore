@@ -351,3 +351,4 @@ MigrationBackup/
 
 **/TestResults/**
 tests/ARCtrl.Querymodel.Tests/playground_2.fsx
+/RELEASE_NOTES.md
