@@ -25,7 +25,7 @@
   </ItemGroup> 
   
   <ItemGroup>
-    <PackageReference Include="ARCtrl" Version="2.0.0" />
+    <PackageReference Include="ARCtrl" Version="2.0.1" />
     <PackageReference Include="FsSpreadsheet" Version="6.2.0" />
     <PackageReference Include="FsSpreadsheet.Net" Version="6.2.0" />
     <PackageReference Include="JsonDSL" Version="0.0.5" />

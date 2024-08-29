@@ -1,5 +1,6 @@
-### 2.0.0+c205ff9 (Released 2024-8-28)
+### 2.0.0+c79c68d (Released 2024-8-29)
 * Additions:
+    * [[#c79c68d](https://github.com/nfdi4plants/ARCtrl.NET/commit/c79c68d4240f044fec4585a4dfb9cb464afc2bb3)] bump to 2.0.1
     * [[#bc26f3d](https://github.com/nfdi4plants/ARCtrl.NET/commit/bc26f3d3aa3e124f1fbf53871b036105f4e988ac)] Create manage-issues.yml
     * [[#075458b](https://github.com/nfdi4plants/ARCtrl.NET/commit/075458b84a50b745ce1dc572a1d35897e1b90d6b)] update dependencies of ARCtrl.NET
 * Deletions:
