@@ -1,3 +1,7 @@
+### 2.0.1+91e698a (Released 2024-8-29)
+* Bugfixes:
+    * [[#91e698a](https://github.com/nfdi4plants/ARCtrl.NET/commit/91e698aadc0f468284c2d48234c37595f94e2e44)] update ARCtrl dependency for 2.0.1 hotfix
+
 ### 2.0.0+c79c68d (Released 2024-8-29)
 * Additions:
     * [[#c79c68d](https://github.com/nfdi4plants/ARCtrl.NET/commit/c79c68d4240f044fec4585a4dfb9cb464afc2bb3)] bump to 2.0.1
