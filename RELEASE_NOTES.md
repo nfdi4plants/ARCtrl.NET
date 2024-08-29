@@ -1,6 +1,9 @@
-### 2.0.0+075458b (Released 2024-4-22)
+### 2.0.0+c205ff9 (Released 2024-8-28)
 * Additions:
+    * [[#bc26f3d](https://github.com/nfdi4plants/ARCtrl.NET/commit/bc26f3d3aa3e124f1fbf53871b036105f4e988ac)] Create manage-issues.yml
     * [[#075458b](https://github.com/nfdi4plants/ARCtrl.NET/commit/075458b84a50b745ce1dc572a1d35897e1b90d6b)] update dependencies of ARCtrl.NET
+* Deletions:
+    * [[#9f0e80c](https://github.com/nfdi4plants/ARCtrl.NET/commit/9f0e80c6b0969f6bba57cd492e8bdf1ccece628e)] remove querymodel from build and update ARCtrl
 
 ### 1.0.5+2195d8a (Released 2024-2-21)
 * Additions:
