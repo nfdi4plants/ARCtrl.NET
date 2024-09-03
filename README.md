@@ -1,5 +1,7 @@
 ﻿# ARCtrl.NET
 
+<a href="https://www.nuget.org/packages/ARCtrl/"><img alt="Nuget" src="https://img.shields.io/nuget/v/ARCtrl?logo=nuget&color=%234fb3d9"></a>
+
 This library functions as an IO wrapper for the [ARCtrl](https://github.com/nfdi4plants/ARCtrl) library in .NET. 
 
 The documentation for the actual functions for manipulating the ARC datamodel can be found [here](https://github.com/nfdi4plants/ARCtrl/tree/main/docs/scripts_fsharp).
@@ -7,7 +9,7 @@ The documentation for the actual functions for manipulating the ARC datamodel ca
 ## Usage
 
 ```fsharp
-#r "nuget: ARCtrl.NET, 1.0.0-beta.2"
+#r "nuget: ARCtrl.NET"
 
 open ARCtrl.NET
 open ARCtrl
