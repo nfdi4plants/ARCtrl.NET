@@ -1,10 +1,11 @@
 ﻿namespace ARCtrl.QueryModel
 
-open ARCtrl.ISA
+open ARCtrl
+open ARCtrl.Process
 open OntologyAnnotation
 open System.Text.Json.Serialization
 open System.Collections.Generic
-open OBO.NET
+open ARCtrl.Process.Conversion
 
 type ISAValue =
     | Parameter of ProcessParameterValue
@@ -21,19 +22,19 @@ type ISAValue =
 
     static member tryCompose (header : CompositeHeader) (cell : CompositeCell) =
         if header.isCharacteristic then 
-            ARCtrl.ISA.ArcTableAux.JsonTypes.composeCharacteristicValue header cell 
+            JsonTypes.composeCharacteristicValue header cell 
             |> Characteristic 
             |> Some
         elif header.isFactor then
-            ARCtrl.ISA.ArcTableAux.JsonTypes.composeFactorValue header cell
+            JsonTypes.composeFactorValue header cell
             |> Factor
             |> Some
         elif header.isComponent then
-            ARCtrl.ISA.ArcTableAux.JsonTypes.composeComponent header cell
+            JsonTypes.composeComponent header cell
             |> Component
             |> Some
         elif header.isParameter then
-            ARCtrl.ISA.ArcTableAux.JsonTypes.composeParameterValue header cell
+            JsonTypes.composeParameterValue header cell
             |> Parameter
             |> Some
         else None
@@ -194,26 +195,26 @@ module ISAValueExtensions =
             | Factor f          -> if this.HasValue && this.HasUnit then Some f.ValueWithUnitText else None
             | Component c       -> if this.HasValue && this.HasUnit then Some c.ValueWithUnitText else None
 
-        member this.HasParentCategory(parentOntology : OntologyAnnotation, ont : OboOntology) = 
-            match this.TryCategory with
-            | Some oa -> oa.IsChildTermOf(parentOntology,ont)
-            | None -> false
+        //member this.HasParentCategory(parentOntology : OntologyAnnotation, ont : OboOntology) = 
+        //    match this.TryCategory with
+        //    | Some oa -> oa.IsChildTermOf(parentOntology,ont)
+        //    | None -> false
             
-        member this.HasParentCategory(parentOntology : OntologyAnnotation) = 
-            match this.TryCategory with
-            | Some oa -> oa.IsChildTermOf(parentOntology)
-            | None -> false
+        //member this.HasParentCategory(parentOntology : OntologyAnnotation) = 
+        //    match this.TryCategory with
+        //    | Some oa -> oa.IsChildTermOf(parentOntology)
+        //    | None -> false
 
-        member this.GetAs(targetOntology : string, ont : OboOntology) = 
-            match this with
-            | Parameter p       -> p.GetAs(targetOntology,ont) |> Parameter
-            | Characteristic c  -> c.GetAs(targetOntology,ont) |> Characteristic
-            | Factor f          -> f.GetAs(targetOntology,ont) |> Factor
-            | Component c       -> c.GetAs(targetOntology,ont) |> Component
+        //member this.GetAs(targetOntology : string, ont : OboOntology) = 
+        //    match this with
+        //    | Parameter p       -> p.GetAs(targetOntology,ont) |> Parameter
+        //    | Characteristic c  -> c.GetAs(targetOntology,ont) |> Characteristic
+        //    | Factor f          -> f.GetAs(targetOntology,ont) |> Factor
+        //    | Component c       -> c.GetAs(targetOntology,ont) |> Component
 
-        member this.TryGetAs(targetOntology : string, ont : OboOntology) = 
-            match this with
-            | Parameter p       -> p.TryGetAs(targetOntology,ont) |> Option.map Parameter
-            | Characteristic c  -> c.TryGetAs(targetOntology,ont) |> Option.map Characteristic
-            | Factor f          -> f.TryGetAs(targetOntology,ont) |> Option.map Factor
-            | Component c       -> c.TryGetAs(targetOntology,ont) |> Option.map Component
+        //member this.TryGetAs(targetOntology : string, ont : OboOntology) = 
+        //    match this with
+        //    | Parameter p       -> p.TryGetAs(targetOntology,ont) |> Option.map Parameter
+        //    | Characteristic c  -> c.TryGetAs(targetOntology,ont) |> Option.map Characteristic
+        //    | Factor f          -> f.TryGetAs(targetOntology,ont) |> Option.map Factor
+        //    | Component c       -> c.TryGetAs(targetOntology,ont) |> Option.map Component

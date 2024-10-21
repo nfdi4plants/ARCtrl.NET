@@ -1,6 +1,6 @@
 ﻿namespace ARCtrl.QueryModel
 
-open ARCtrl.ISA
+open ARCtrl
 open System.Text.Json.Serialization
 open System.Text.Json
 open System.IO
@@ -97,15 +97,15 @@ module Study =
         | None -> raise StudyHasNoPublicReleaseDateException
     let publications (s : ArcStudy) = 
         match s.Publications with
-        | [||] -> raise StudyHasNoPublicationsException
+        | a when a.Count = 0 -> raise StudyHasNoPublicationsException
         | a -> a
     let contacts (s : ArcStudy) = 
         match s.Contacts with
-        | [||] -> raise StudyHasNoContactsException
+        | a when a.Count = 0 -> raise StudyHasNoContactsException
         | v -> v
     let designDescriptors (s : ArcStudy) = 
         match s.StudyDesignDescriptors with
-        | [||] -> raise StudyHasNoDesignDescriptorsException
+        | a when a.Count = 0 -> raise StudyHasNoDesignDescriptorsException
         | v -> v
     //let protocols (s : ArcStudy) = 
     //    match s.proto with

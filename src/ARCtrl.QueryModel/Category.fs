@@ -1,6 +1,6 @@
 ﻿namespace ARCtrl.QueryModel
 
-open ARCtrl.ISA
+open ARCtrl
 open System.Text.Json.Serialization
 
 

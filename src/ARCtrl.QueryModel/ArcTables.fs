@@ -1,6 +1,6 @@
 ﻿namespace rec ARCtrl.QueryModel
 
-open ARCtrl.ISA
+open ARCtrl
 open System.Text.Json.Serialization
 open System.Text.Json
 open System.IO
@@ -20,13 +20,7 @@ module ArcTables =
 
         member this.isMaterial = match this with | IOType.Material -> true | _ -> false
 
-        member this.isRawData = match this with | IOType.RawDataFile -> true | _ -> false
-
-        member this.isProcessedData = match this with | IOType.DerivedDataFile -> true | _ -> false
-
-        member this.isImage = match this with | IOType.ImageFile -> true | _ -> false
-
-        member this.isData = this.isProcessedData || this.isRawData || this.isImage
+        member this.isData = match this with | IOType.Data -> true | _ -> false
 
 
     /// Type representing a queryable collection of processes, which model the experimental graph
@@ -415,54 +409,6 @@ module ArcTables =
         member this.LastDataOf(node) = 
             ArcTables.getFinalOutputsOfBy (fun (io : IOType) -> io.isData) node this
 
-        /// Returns the names of all raw data in the Process sequence, that are connected to the given node
-        member this.RawDataOf(node : QNode) =
-            ArcTables.getNodesOfBy (fun (io : IOType) -> io.isRawData) node.Name this
-
-        /// Returns the names of all raw data in the Process sequence, that are connected to the given node
-        member this.RawDataOf(node) =
-            ArcTables.getNodesOfBy (fun (io : IOType) -> io.isRawData) node this
-    
-        /// Returns the names of all the input raw data in the Process sequence to which no output points, that are connected to the given node
-        member this.FirstRawDataOf(node : QNode) = 
-            ArcTables.getRootInputsOfBy (fun (io : IOType) -> io.isRawData) node.Name this
-
-        /// Returns the names of all the output raw data in the Process sequence that point to no input, that are connected to the given node
-        member this.LastRawDataOf(node : QNode) = 
-            ArcTables.getFinalOutputsOfBy (fun (io : IOType) -> io.isRawData) node.Name this
-
-        /// Returns the names of all the input raw data in the Process sequence to which no output points, that are connected to the given node
-        member this.FirstRawDataOf(node) = 
-            ArcTables.getRootInputsOfBy (fun (io : IOType) -> io.isRawData) node this
-
-        /// Returns the names of all the output raw data in the Process sequence that point to no input, that are connected to the given node
-        member this.LastRawDataOf(node) = 
-            ArcTables.getFinalOutputsOfBy (fun (io : IOType) -> io.isRawData) node this
-
-        /// Returns the names of all processed data in the Process sequence, that are connected to the given node
-        member this.ProcessedDataOf(node : QNode) =
-            ArcTables.getNodesOfBy (fun (io : IOType) -> io.isProcessedData) node.Name this
-
-        /// Returns the names of all processed data in the Process sequence, that are connected to the given node
-        member this.ProcessedDataOf(node) =
-            ArcTables.getNodesOfBy (fun (io : IOType) -> io.isProcessedData) node this
-
-        /// Returns the names of all the input processed data in the Process sequence to which no output points, that are connected to the given node
-        member this.FirstProcessedDataOf(node : QNode) = 
-            ArcTables.getRootInputsOfBy (fun (io : IOType) -> io.isProcessedData) node.Name this
-
-        /// Returns the names of all the output processed data in the Process sequence that point to no input, that are connected to the given node
-        member this.LastProcessedDataOf(node : QNode) = 
-            ArcTables.getFinalOutputsOfBy (fun (io : IOType) -> io.isProcessedData) node.Name this
-
-        /// Returns the names of all the input processed data in the Process sequence to which no output points, that are connected to the given node
-        member this.FirstProcessedDataOf(node) = 
-            ArcTables.getRootInputsOfBy (fun (io : IOType) -> io.isProcessedData) node this
-
-        /// Returns the names of all the output processed data in the Process sequence that point to no input, that are connected to the given node
-        member this.LastProcessedDataOf(node) = 
-            ArcTables.getFinalOutputsOfBy (fun (io : IOType) -> io.isProcessedData) node this
-
         /// Returns all values in the process sequence
         ///
         /// If a protocol name is given, returns only the values of the processes that implement this protocol
@@ -762,30 +708,6 @@ module ArcTables =
         member this.LastData = 
             ArcTables.getFinalOutputsBy (fun (io : IOType) -> io.isData) this
 
-        /// Returns the names of all raw data in the Process sequence
-        member this.RawData =
-            ArcTables.getNodesBy (fun (io : IOType) -> io.isRawData) this
-
-        /// Returns the names of all the input raw data in the Process sequence to which no output points
-        member this.FirstRawData = 
-            ArcTables.getRootInputsBy (fun (io : IOType) -> io.isRawData) this
-
-        /// Returns the names of all the output raw data in the Process sequence that point to no input
-        member this.LastRawData = 
-            ArcTables.getFinalOutputsBy (fun (io : IOType) -> io.isRawData) this
-    
-        /// Returns the names of all processed data in the Process sequence
-        member this.ProcessedData =
-            ArcTables.getNodesBy (fun (io : IOType) -> io.isProcessedData) this
-
-        /// Returns the names of all the input processed data in the Process sequence to which no output points
-        member this.FirstProcessedData = 
-            ArcTables.getRootInputsBy (fun (io : IOType) -> io.isProcessedData) this
-
-        /// Returns the names of all the output processed data in the Process sequence that point to no input
-        member this.LastProcessedData = 
-            ArcTables.getFinalOutputsBy (fun (io : IOType) -> io.isProcessedData) this
-
     /// One Node of an ISA Process Sequence (Source, Sample, Data)
     type QNode(Name : string, IOType : IOType, ?ParentProcessSequence : ArcTables) =
     
@@ -826,12 +748,6 @@ module ArcTables =
         /// Returns true, if the node is a data
         member this.isData = this.IOType.isData
 
-        /// Returns true, if the node is a raw data
-        member this.isRawData = this.IOType.isRawData
-    
-        /// Returns true, if the node is a processed data
-        member this.isProcessedData = this.IOType.isProcessedData
-
         /// Returns true, if the node is a material
         member this.isMaterial = this.IOType.isMaterial
 
@@ -870,24 +786,6 @@ module ArcTables =
 
             /// Returns all other data in the process sequence, that are connected to this node and have no more sink nodes they point to
             member this.LastData = this.ParentProcessSequence.LastNodesOf(this)
-
-            /// Returns all other raw data in the process sequence, that are connected to this node
-            member this.RawData = this.ParentProcessSequence.RawDataOf(this)
-
-            /// Returns all other raw data in the process sequence, that are connected to this node and have no more origin nodes pointing to them
-            member this.FirstRawData = this.ParentProcessSequence.FirstRawDataOf(this)
-
-            /// Returns all other raw data in the process sequence, that are connected to this node and have no more sink nodes they point to
-            member this.LastRawData = this.ParentProcessSequence.LastRawDataOf(this)
-
-            /// Returns all other processed data in the process sequence, that are connected to this node
-            member this.ProcessedData = this.ParentProcessSequence.ProcessedDataOf(this)
-
-            /// Returns all other processed data in the process sequence, that are connected to this node and have no more sink nodes they point to
-            member this.FirstProcessedData = this.ParentProcessSequence.FirstProcessedDataOf(this)
-
-            /// Returns all other processed data in the process sequence, that are connected to this node and have no more sink nodes they point to
-            member this.LastProcessedData = this.ParentProcessSequence.LastProcessedDataOf(this)
 
             /// Returns all values in the process sequence, that are connected to this given node
             member this.Values = this.ParentProcessSequence.ValuesOf(this)

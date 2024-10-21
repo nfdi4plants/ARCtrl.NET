@@ -1,14 +1,15 @@
 ﻿namespace ARCtrl.QueryModel
-open ARCtrl.ISA
+
+open ARCtrl
 
 module Person = 
 
     open Errors
 
-    let id (p : Person) =
-        match p.ID with
-        | Some v -> v
-        | None -> raise PersonHasNoIDException
+    //let id (p : Person) =
+    //    match p.ID with
+    //    | Some v -> v
+    //    | None -> raise PersonHasNoIDException
     let lastName (p : Person) =
         match p.LastName with
         | Some v -> v
@@ -41,11 +42,11 @@ module Person =
         match p.Affiliation with
         | Some v -> Ok v
         | None -> raise PersonHasNoAffiliationException
-    let roles (p : Person) =
-        match p.Roles with
-        | Some v -> Ok v
-        | None -> raise PersonHasNoRolesException
-    let comments (p : Person) =
-        match p.Comments with
-        | Some v -> Ok v
-        | None -> raise PersonHasNoCommentsException
+    //let roles (p : Person) =
+    //    match p.Roles with
+    //    | Some v -> Ok v
+    //    | None -> raise PersonHasNoRolesException
+    //let comments (p : Person) =
+    //    match p.Comments with
+    //    | Some v -> Ok v
+    //    | None -> raise PersonHasNoCommentsException

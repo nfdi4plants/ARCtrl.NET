@@ -4,14 +4,17 @@ open Expecto
 open System.Text.Json
 open ARCtrl
 open ARCtrl.NET
+open ARCtrl.Process
 open ARCtrl.QueryModel
-open ARCtrl.ISA
 let testArcPath = __SOURCE_DIRECTORY__ + @"\TestObjects\TestArc"
 let testArc = ARC.load(testArcPath)
+
+open ARCtrl.QueryModel.ArcInvestigationExtensions
 
 
 let ArcTables_getNodes =
     let isa = testArc.ISA.Value
+    
     testList "ARCTables_GetNodes" [
         testCase "LastData" (fun () -> 
             let nodes = isa.ArcTables.LastData
@@ -31,24 +34,24 @@ let ArcTables_getNodes =
             let expected = ["sampleOutCold.txt"; "sampleOutHeat.txt"]
             Expect.sequenceEqual nodeNames expected "LastData of full sequence"    
         )
-        testCase "RawData" (fun () ->
-            let nodes = isa.ArcTables.RawData
-            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
-            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
-            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
-        )
-        testCase "LastRawData" (fun () ->
-            let nodes = isa.ArcTables.LastRawData
-            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
-            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
-            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
-        )
-        testCase "FirstRawData" (fun () ->
-            let nodes = isa.ArcTables.FirstRawData
-            let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
-            let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
-            Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
-        )
+        //testCase "RawData" (fun () ->
+        //    let nodes = isa.ArcTables.RawData
+        //    let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+        //    let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+        //    Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        //)
+        //testCase "LastRawData" (fun () ->
+        //    let nodes = isa.ArcTables.LastRawData
+        //    let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+        //    let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+        //    Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        //)
+        //testCase "FirstRawData" (fun () ->
+        //    let nodes = isa.ArcTables.FirstRawData
+        //    let nodeNames = nodes |> Seq.map (fun n -> n.Name)        
+        //    let expected = ["CC1_measured";"CC2_measured";"CC3_measured";"Co1_measured";"Co2_measured";"Co3_measured";"C1_measured";"C2_measured";"C3_measured";"H1_measured";"H2_measured";"H3_measured"]
+        //    Expect.sequenceEqual nodeNames expected "RawData of full sequence"    
+        //)
     ]
 
 let Assay_getNodes =
@@ -98,13 +101,13 @@ let ArcTables_ValueOf =
     testList "ArcTable_Values" [
         testCase "ValuesOf_SpecificTable" (fun () ->
             let nodeName = "sampleOutHeat.txt"
-            let protocolName =  "MS"            
+            let protocolName =  "MS_Heat"            
             let values = isa.ArcTables.ValuesOf(nodeName,protocolName)
             let expectedTechRep =
                 ISAValue.Parameter (
                         ProcessParameterValue.create(
                             ProtocolParameter.fromString("technical replicate","MS","MS:1001808"), 
-                            Value.Ontology (OntologyAnnotation.fromString("1"))
+                            Value.Ontology (OntologyAnnotation("1"))
                         )
                     )
             let expectedInjVol =
@@ -112,7 +115,7 @@ let ArcTables_ValueOf =
                         ProcessParameterValue.create(
                             ProtocolParameter.fromString("injection volume setting","AFR","AFR:0001577"), 
                             Value.Int 20,
-                            OntologyAnnotation.fromString("microliter","UO","http://purl.obolibrary.org/obo/UO_0000101")
+                            OntologyAnnotation("microliter","UO","http://purl.obolibrary.org/obo/UO_0000101")
                         )
                     )
             let expected = 
@@ -143,11 +146,11 @@ let ArcTables_ValueOf =
             Expect.equal rep2 "2" "Did not return correct value for specific table"
         )
         testCase "ValuesOf_SpecificTable_PooledOutput" (fun () ->
-            let vals = isa.ArcTables.ValuesOf("sampleOutHeat.txt","Growth").WithName("biological replicate").Values |> List.map (fun v -> v.ValueText)         
+            let vals = isa.ArcTables.ValuesOf("sampleOutHeat.txt","Growth_Heat").WithName("biological replicate").Values |> List.map (fun v -> v.ValueText)         
             Expect.sequenceEqual vals ["1";"2";"3";"1";"2";"3"] "Did not return correct values"
         )
         testCase "SpecificValue_SpecificTable_PooledOutput" (fun () ->
-            let vals = isa.ArcTables.ValuesOf("C2_prep","Growth").WithName("biological replicate").First.ValueText
+            let vals = isa.ArcTables.ValuesOf("C2_prep","Growth_Heat").WithName("biological replicate").First.ValueText
             Expect.equal vals "2" "Did not return correct value"
         )
     ]

@@ -18,15 +18,32 @@ let runTests = BuildTask.create "RunTests" [clean; runTestClean; build] {
     testProjects
     |> Seq.iter (fun testProject ->
         Fake.DotNet.DotNet.test(fun testParams ->
+            let msBuildParams =
+                {testParams.MSBuildParams with 
+                    DisableInternalBinLog = true
+            }
             {
                 testParams with
                     Logger = Some "console;verbosity=detailed"
                     Configuration = DotNet.BuildConfiguration.fromString configuration
                     NoBuild = true
+                    MSBuildParams = msBuildParams
             }
         ) testProject
     )
 }
+
+    //|> DotNet.build (fun p ->
+    //    let msBuildParams =
+    //        {p.MSBuildParams with 
+    //            DisableInternalBinLog = true
+    //        }
+    //    {
+    //        p with 
+    //            MSBuildParams = msBuildParams
+    //    }
+    //    |> DotNet.Options.withCustomParams (Some "-tl")
+    //)
 
 // to do: use this once we have actual tests
 let runTestsWithCodeCov = BuildTask.create "RunTestsWithCodeCov" [clean; runTestClean; build] {

@@ -1,6 +1,7 @@
 ﻿namespace ARCtrl.QueryModel
 
-open ARCtrl.ISA
+open ARCtrl
+open ARCtrl.Process
 open System.Text.Json.Serialization
 open System.Text.Json
 open System.IO
@@ -101,11 +102,11 @@ module ProtocolExtensions =
                 OntologyAnnotation.isChildTerm(parentProtocolType,pt)
             | _ -> false
 
-        member this.IsChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : OBO.NET.OboOntology) =
-            match this.ProtocolType with
-            | Some pt ->
-                OntologyAnnotation.isChildTerm(parentProtocolType,pt,obo)
-            | _ -> false
+        //member this.IsChildProtocolOf(parentProtocolType : OntologyAnnotation, obo : OBO.NET.OboOntology) =
+        //    match this.ProtocolType with
+        //    | Some pt ->
+        //        OntologyAnnotation.isChildTerm(parentProtocolType,pt,obo)
+        //    | _ -> false
 
     
     type ProtocolDescriptor<'T> =
