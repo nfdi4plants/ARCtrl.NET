@@ -1,3 +1,8 @@
+### 2.0.2+0fa20cf (Released 2024-10-21)
+* Additions:
+    * [[#c0faecc](https://github.com/nfdi4plants/ARCtrl.NET/commit/c0faeccc18f20a366c65d3a8b4d67e23f509aa89)] Update README.md
+    * [[#0fa20cf](https://github.com/nfdi4plants/ARCtrl.NET/commit/0fa20cf9f2228b6dfc43bc04010f35a7b89f3413)] update Querymodel ARCtrl reference
+
 ### 2.0.1+91e698a (Released 2024-8-29)
 * Bugfixes:
     * [[#91e698a](https://github.com/nfdi4plants/ARCtrl.NET/commit/91e698aadc0f468284c2d48234c37595f94e2e44)] update ARCtrl dependency for 2.0.1 hotfix
