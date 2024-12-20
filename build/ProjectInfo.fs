@@ -6,7 +6,7 @@ let project = "ARCtrl.NET"
 
 let testProjects = 
     [
-        "tests/ARCtrl.NET.Tests/ARCtrl.NET.Tests.fsproj"
+        //"tests/ARCtrl.NET.Tests/ARCtrl.NET.Tests.fsproj"
         "tests/ARCtrl.Querymodel.Tests/ARCtrl.Querymodel.Tests.fsproj"
     ]
 

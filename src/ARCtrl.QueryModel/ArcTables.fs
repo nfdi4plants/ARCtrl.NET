@@ -709,16 +709,16 @@ module ArcTables =
             ArcTables.getFinalOutputsBy (fun (io : IOType) -> io.isData) this
 
     /// One Node of an ISA Process Sequence (Source, Sample, Data)
-    type QNode(Name : string, IOType : IOType, ?ParentProcessSequence : ArcTables) =
+    type QNode(name : string, ioType : IOType, ?parentProcessSequence : ArcTables) =
     
         /// Returns the process sequence in which the node appears
-        member this.ParentProcessSequence = ParentProcessSequence |> Option.defaultValue (ArcTables(ResizeArray []))
+        member this.ParentProcessSequence = parentProcessSequence |> Option.defaultValue (ArcTables(ResizeArray []))
 
         /// Identifying name of the node
-        member this.Name = Name
+        member this.Name = name
 
         /// Type of node (source, sample, data, raw data ...)
-        member this.IOType : IOType = IOType
+        member this.IOType : IOType = ioType
 
         interface System.IEquatable<QNode> with
             member this.Equals other = other.Name.Equals this.Name

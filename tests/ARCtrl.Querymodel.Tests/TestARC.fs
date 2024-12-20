@@ -3,7 +3,6 @@
 open Expecto
 open System.Text.Json
 open ARCtrl
-open ARCtrl.NET
 open ARCtrl.Process
 open ARCtrl.QueryModel
 let testArcPath = __SOURCE_DIRECTORY__ + @"\TestObjects\TestArc"

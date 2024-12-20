@@ -16,11 +16,7 @@
     <PackageReference Include="Expecto" Version="10.1.0" />
     <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
-    <ProjectReference Include="..\..\src\ARCtrl.NET\ARCtrl.NET.fsproj" />
     <ProjectReference Include="..\..\src\ARCtrl.QueryModel\ARCtrl.QueryModel.fsproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="7.0.401" />
-  </ItemGroup>
 </Project>
