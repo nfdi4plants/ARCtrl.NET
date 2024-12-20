@@ -2,7 +2,7 @@
 
 open Fake.Core
 
-let project = "ARCtrl.NET"
+let project = "ARCtrl.Querymodel"
 
 let testProjects = 
     [

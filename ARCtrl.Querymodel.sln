@@ -8,9 +8,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E13D0F57-B0E0-4BAA-BD27-9136C8307BDA}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.github\workflows\build-test.yml = .github\workflows\build-test.yml
 		build.cmd = build.cmd
 		global.json = global.json
 		LICENSE = LICENSE
+		.github\workflows\manage-issues.yml = .github\workflows\manage-issues.yml
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
