@@ -1,3 +1,10 @@
+### 2.1.0+5fad60b (Released 2024-12-20)
+* Deletions:
+    * [[#240e99b](https://github.com/nfdi4plants/ARCtrl.Querymodel/commit/240e99bfc80dc5beaf280e5df277db59125c02e6)] remove deprecated ARCtrl.NET project and rename to ARCtrl.Querymodel
+* Bugfixes:
+    * [[#5fad60b](https://github.com/nfdi4plants/ARCtrl.Querymodel/commit/5fad60b3a13219e3503639c87a612257b12401eb)] small fix to build and test workflow
+    * [[#5b3147e](https://github.com/nfdi4plants/ARCtrl.Querymodel/commit/5b3147e56ae9579094ad0ec210e556ad4ddc107a)] unsupported log file format fix....
+
 ### 2.0.2+0fa20cf (Released 2024-10-21)
 * Additions:
     * [[#c0faecc](https://github.com/nfdi4plants/ARCtrl.NET/commit/c0faeccc18f20a366c65d3a8b4d67e23f509aa89)] Update README.md
